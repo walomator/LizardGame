@@ -1,0 +1,6 @@
+This bugs.txt file will be used until someone figures out proper bug tracking.
+
+Bugs:
+movement
+If both directions are held down, the first direction gets priority.
+This causes problems when a direction button is released.
