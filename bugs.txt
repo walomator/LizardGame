@@ -1,15 +1,24 @@
 This bugs.txt file will be used until someone figures out proper bug tracking.
+In-line with commit:
+8 of branch movement
 
 Bugs:
 movement
-38 If both directions are held down, the first direction gets priority.
+67 If both directions are held down, the first direction gets priority.
 This causes problems when a direction button is released.
 
-15 Jumping upward has no speed limit (though that may not be necessary)
+20 Jumping upward has no speed limit (though that may not be necessary)
 
-30 Logical error in calculating distance moved since last frame (I think)
+35 Logical error in calculating distance moved since last frame (I think).
+This is a "Bethesda-esque" framerate dependant bug. Big if true.
+
+47 Possible: may introduce problems running up slopes at the wrong speed.
 
 
+General:
 display
 No pixel alignment
 No variable resolutions
+
+animation
+No animation

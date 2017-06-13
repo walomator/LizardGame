@@ -18,10 +18,10 @@ extents = Vector2( 16, 16 )
 
 [node name="Protagonist" type="KinematicBody2D" parent="."]
 
-transform/pos = Vector2( 416, 160 )
+transform/pos = Vector2( 416, 176 )
 input/pickable = false
 shapes/0/shape = SubResource( 1 )
-shapes/0/transform = Matrix32( 1, 0, 0, 1.26567, 0.631134, 11.5167 )
+shapes/0/transform = Matrix32( 1, 0, 0, 1, 0, 16 )
 shapes/0/trigger = false
 collision/layers = 1
 collision/mask = 1
@@ -37,15 +37,15 @@ __meta__ = {
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Protagonist"]
 
-transform/pos = Vector2( 0.631134, 11.5167 )
-transform/scale = Vector2( 1, 1.26567 )
+transform/pos = Vector2( 0, 16 )
 shape = SubResource( 1 )
 trigger = false
 _update_shape_index = 0
 
 [node name="WalkTile" type="StaticBody2D" parent="."]
 
-transform/pos = Vector2( 416, 208 )
+editor/display_folded = true
+transform/pos = Vector2( 416, 224 )
 input/pickable = false
 shapes/0/shape = SubResource( 2 )
 shapes/0/transform = Matrix32( 1, 0, 0, 1, 0, 0 )
@@ -65,6 +65,62 @@ __meta__ = {
 }
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="WalkTile"]
+
+shape = SubResource( 2 )
+trigger = false
+_update_shape_index = 0
+
+[node name="WalkTile1" type="StaticBody2D" parent="."]
+
+editor/display_folded = true
+transform/pos = Vector2( 448, 224 )
+input/pickable = false
+shapes/0/shape = SubResource( 2 )
+shapes/0/transform = Matrix32( 1, 0, 0, 1, 0, 0 )
+shapes/0/trigger = false
+collision/layers = 1
+collision/mask = 1
+constant_linear_velocity = Vector2( 0, 0 )
+constant_angular_velocity = 0.0
+friction = 1.0
+bounce = 0.0
+
+[node name="Sprite" type="Sprite" parent="WalkTile1"]
+
+texture = ExtResource( 3 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WalkTile1"]
+
+shape = SubResource( 2 )
+trigger = false
+_update_shape_index = 0
+
+[node name="WalkTile2" type="StaticBody2D" parent="."]
+
+editor/display_folded = true
+transform/pos = Vector2( 576, 224 )
+input/pickable = false
+shapes/0/shape = SubResource( 2 )
+shapes/0/transform = Matrix32( 1, 0, 0, 1, 0, 0 )
+shapes/0/trigger = false
+collision/layers = 1
+collision/mask = 1
+constant_linear_velocity = Vector2( 0, 0 )
+constant_angular_velocity = 0.0
+friction = 1.0
+bounce = 0.0
+
+[node name="Sprite" type="Sprite" parent="WalkTile2"]
+
+texture = ExtResource( 3 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WalkTile2"]
 
 shape = SubResource( 2 )
 trigger = false
