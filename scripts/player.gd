@@ -12,7 +12,7 @@ var speed_y = 0
 var velocity = Vector2(0, 0)
 
 const MAX_SPEED_X = 250
-const MAX_SPEED_Y = 200 # BUG - limits falling speed, not jump speed
+const MAX_SPEED_Y = 250 # BUG - limits falling speed, not jump speed
 
 const JUMP_FORCE = 350
 const GRAVITY = 750 # Opposes jump force
@@ -27,7 +27,7 @@ func _process(delta):
 	speed_y += GRAVITY * delta
 	
 	velocity.x = speed_x * delta * direction
-	velocity.y = speed_y * delta
+	velocity.y = speed_y * delta # BUG - this does not work perfectly with gravitational acceleration. Causes "Fallout 4 physics"
 	move(velocity)
 
 

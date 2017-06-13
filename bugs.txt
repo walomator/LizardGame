@@ -2,5 +2,10 @@ This bugs.txt file will be used until someone figures out proper bug tracking.
 
 Bugs:
 movement
-If both directions are held down, the first direction gets priority.
+38 If both directions are held down, the first direction gets priority.
 This causes problems when a direction button is released.
+
+15 Jumping upward has no speed limit (though that may not be necessary)
+
+30 Logical error in calculating distance moved since last frame (I think)
+
