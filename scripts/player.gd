@@ -11,7 +11,7 @@ var speed_x = 0
 var speed_y = 0
 var velocity = Vector2(0, 0)
 
-const MAX_SPEED_X = 250
+const MAX_SPEED_X = 250 # Right now there is no acceleration, but I'd like to add a little bit back in
 const MAX_SPEED_Y = 250 # BUG - limits falling speed, not jump speed
 
 const JUMP_FORCE = 350

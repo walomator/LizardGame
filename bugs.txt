@@ -9,3 +9,7 @@ This causes problems when a direction button is released.
 
 30 Logical error in calculating distance moved since last frame (I think)
 
+
+display
+No pixel alignment
+No variable resolutions
