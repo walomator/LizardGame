@@ -15,6 +15,10 @@ This is a "Bethesda-esque" framerate dependant bug. Big if true.
 47 Possible: may introduce problems running up slopes at the wrong speed.
 
 
+tilemaps
+Not a bug, but .tmx files won't load properly when you move dependency files.
+This is a problem for sharing .tmx files, but isn't a bug of our own making.
+
 General:
 display
 No pixel alignment
