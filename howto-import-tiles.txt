@@ -1,0 +1,15 @@
+This is not an exhaustive explanation.
+
+You can make tilemaps in Tiled (though they don't work with any physics yet).
+
+You can import .tmx into Godot as .scn with the Tiled Map Importer addon.
+  The addon should be installed automatically because it is captured by git.
+  
+  If it is not working, you can find Godot addons in the AssetLib tab.
+  Scene menu -> Project Settings -> Plugins -> set to Active
+  
+  Video tutorial:
+  https://www.youtube.com/watch?v=jFq4Eve_Db8&user=UCxboW7x0jZqFdvMdCFKTMsQ
+  
+In the World.tscn, instance the tilemap, now saved as a scene, as a child scene.
+For a better explanation, ask Walomator for help.
