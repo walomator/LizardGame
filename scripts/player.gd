@@ -53,7 +53,7 @@ func _process(delta):
 		# Possible BUG - it may mean that walking up slopes makes the character move slower, which isn't desired.
 		# It may also mean that you cannot run up slopes, not sure.
 		# It makes (somewhat) sense logically, though it's harder to see it's basis in physics.
-	elif jump_count == 0:
+	elif jump_count == 0: # If player fell off a ledge
 		jump_count = 1
 
 
