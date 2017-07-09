@@ -1,11 +1,7 @@
 # LizardGame beta 1.0
-# Branch: movement
-# Commits: 7
 
 extends KinematicBody2D
 
-# Some of these values have not been tested to be good for gameplay
-# What gameplay? Ha ha ha!
 var debug = 1
 
 var sprite_node # Safe to initialize in the _ready() function
@@ -27,6 +23,7 @@ const GRAVITY = 750 # Opposes jump force
 var jump_count = 0
 var max_jump_count = 2 # Should be 1, but I'm testing double jump
 
+
 func _ready():
 	set_process(true)
 	set_process_input(true)
@@ -38,7 +35,7 @@ func _process(delta):
 	speed_y += GRAVITY * delta
 	
 	velocity.x = speed_x * delta * direction
-	velocity.y = speed_y * delta # BUG - this does not work perfectly with gravitational acceleration. Causes "Fallout 4 physics"
+	velocity.y = speed_y * delta # BUG - this does not work perfectly with gravitational acceleration.
 	
 	# Movement
 	var move_remainder = move(velocity)
@@ -48,14 +45,14 @@ func _process(delta):
 		velocity = collide_normal.slide(move_remainder)
 		move(velocity)
 		
-		if collide_normal == Vector2( 0, -1): # Can't "land" on a sloped surface
+		if collide_normal == Vector2( 0, -1): # Can't land on a sloped surface to refill jump_count
 			jump_count = 0
 		
 		speed_y = collide_normal.slide(Vector2(0, speed_y)).y
 		# This keeps falling speed from accumulating where it shouldn't (eg. on the ground).
 		# Possible BUG - it may mean that walking up slopes makes the character move slower, which isn't desired.
-		# It may also mean that you cannot run up slopes, not sure.
-		# It makes (somewhat) sense logically, though it's harder to see it's basis in physics.
+		# It may also mean that you cannot run up slopes, not sure
+		
 	elif jump_count == 0: # If player fell off a ledge
 		jump_count = 1
 
