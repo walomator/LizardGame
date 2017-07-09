@@ -22,6 +22,9 @@ const MAX_SPEED_Y = 300 # BUG - limits falling speed, not jump speed
 const JUMP_FORCE = 350
 const GRAVITY = 750 # Opposes jump force
 
+var jump_count = 0
+var max_jump_count = 2 # Should be 1, but I'm testing double jump
+
 func _ready():
 	set_process(true)
 	set_process_input(true)
@@ -42,12 +45,16 @@ func _process(delta):
 		velocity = collide_normal.slide(move_remainder)
 		move(velocity)
 		
+		if collide_normal == Vector2( 0, -1): # Can't "land" on a sloped surface
+			jump_count = 0
+		
 		speed_y = collide_normal.slide(Vector2(0, speed_y)).y
 		# This keeps falling speed from accumulating where it shouldn't (eg. on the ground).
 		# Possible BUG - it may mean that walking up slopes makes the character move slower, which isn't desired.
 		# It may also mean that you cannot run up slopes, not sure.
 		# It makes (somewhat) sense logically, though it's harder to see it's basis in physics.
-	
+	elif jump_count == 0:
+		jump_count = 1
 
 
 func _input(event):
@@ -65,9 +72,11 @@ func _input(event):
 		print("stopped")
 		direction = 0
 	
-	if event.is_action_pressed("ui_up"):
+	if event.is_action_pressed("ui_up") and jump_count < max_jump_count:
 		print("jump")
 		speed_y = -JUMP_FORCE
+		
+		jump_count += 1
 		# FEAT - Variable jump length should be a feature later
 	
 	if direction:
