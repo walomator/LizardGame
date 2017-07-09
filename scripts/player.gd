@@ -8,6 +8,8 @@ extends KinematicBody2D
 # What gameplay? Ha ha ha!
 var debug = 1
 
+var sprite_node # Safe to initialize in the _ready() function
+
 var direction = 0 # 0 = stationary, 1 = right, -1 = left
 var last_direction = 0 # The direction last moved, or the facing direction
 
@@ -28,6 +30,7 @@ var max_jump_count = 2 # Should be 1, but I'm testing double jump
 func _ready():
 	set_process(true)
 	set_process_input(true)
+	sprite_node = get_node("Sprite")
 
 
 func _process(delta):
@@ -65,9 +68,11 @@ func _input(event):
 	if event.is_action_pressed("move_right"):
 		print("right")
 		direction = 1
+		sprite_node.set_flip_h(false)
 	elif event.is_action_pressed("move_left"):
 		print("left")
 		direction = -1
+		sprite_node.set_flip_h(true)
 	elif event.is_action_released("move_right") or event.is_action_released("move_left"):
 		print("stopped")
 		direction = 0
