@@ -17,6 +17,8 @@ extents = Vector2( 16, 16 )
 
 [node name="World" type="Node2D"]
 
+visibility/behind_parent = true
+
 [node name="Protagonist" parent="." instance=ExtResource( 1 )]
 
 [node name="WalkTile" type="StaticBody2D" parent="."]
@@ -208,7 +210,6 @@ __meta__ = {
 [node name="map0" parent="." instance=ExtResource( 4 )]
 
 visibility/behind_parent = true
-transform/pos = Vector2( 32, 0 )
 
 
 [editable path="map0"]
