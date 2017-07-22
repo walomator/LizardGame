@@ -14,10 +14,13 @@ var speed_y = 0
 var velocity = Vector2(0, 0)
 var collide_normal
 
+var colliding_body
+
 const MAX_SPEED_X = 250 # Right now there is no acceleration, but I'd like to add a little bit back in
 const MAX_SPEED_Y = 300 # BUG - limits falling speed, not jump speed
 
-const JUMP_FORCE = 350
+const JUMP_FORCE = 420
+const BOUNCE_FORCE = 200 # Should change this to be dependant on the enemy
 const GRAVITY = 750 # Opposes jump force
 
 var jump_count = 0
@@ -27,12 +30,12 @@ var max_jump_count = 2 # Should be 1, but I'm testing double jump
 func _ready():
 	set_process(true)
 	set_process_input(true)
-	sprite_node = get_node("Sprite")
+	sprite_node = get_node("/root/World/Protagonist/IdleSprite")
 
 
 func _process(delta):
 	speed_y = clamp(speed_y, speed_y, MAX_SPEED_Y)
-	speed_y += GRAVITY * delta
+	speed_y += GRAVITY * delta # BUG - delta shouldn't be factored in twice, should it?
 	
 	velocity.x = speed_x * delta * direction
 	velocity.y = speed_y * delta # BUG - this does not work perfectly with gravitational acceleration.
@@ -42,10 +45,19 @@ func _process(delta):
 	
 	if is_colliding():
 		collide_normal = get_collision_normal()
+		colliding_body = get_collider()
+		
+		if colliding_body.is_in_group("Enemies"):
+			if collide_normal == Vector2(0, -1):
+				print("Enemy head smashed")
+				bounce(BOUNCE_FORCE)
+			else:
+				print("You're toast!")
+			
 		velocity = collide_normal.slide(move_remainder)
 		move(velocity)
 		
-		if collide_normal == Vector2( 0, -1): # Can't land on a sloped surface to refill jump_count
+		if collide_normal == Vector2(0, -1): # Can't land on a sloped surface to refill jump_count
 			jump_count = 0
 		
 		speed_y = collide_normal.slide(Vector2(0, speed_y)).y
@@ -55,6 +67,7 @@ func _process(delta):
 		
 	elif jump_count == 0: # If player fell off a ledge
 		jump_count = 1
+	# End if is_colliding()
 
 
 func _input(event):
@@ -62,15 +75,15 @@ func _input(event):
 		last_direction = direction
 	
 	# Input
-	if event.is_action_pressed("move_right"):
+	if event.is_action_pressed("ui_right"):
 		print("right")
 		direction = 1
 		sprite_node.set_flip_h(false)
-	elif event.is_action_pressed("move_left"):
+	elif event.is_action_pressed("ui_left"):
 		print("left")
 		direction = -1
 		sprite_node.set_flip_h(true)
-	elif event.is_action_released("move_right") or event.is_action_released("move_left"):
+	elif (event.is_action_released("ui_right") and direction == 1) or (event.is_action_released("ui_left") and direction == -1):
 		print("stopped")
 		direction = 0
 	
@@ -83,3 +96,7 @@ func _input(event):
 	
 	if direction:
 		speed_x = MAX_SPEED_X
+	
+
+func bounce(force):
+	speed_y = force
