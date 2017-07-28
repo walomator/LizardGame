@@ -9,6 +9,7 @@ var sprite_node # Safe to initialize in the _ready() function
 var direction = 0 # 0 = stationary, 1 = right, -1 = left
 var last_direction = 0 # The direction last moved, or the facing direction
 
+var move_remainder
 var speed_x = 0
 var speed_y = 0
 var velocity = Vector2(0, 0)
@@ -26,14 +27,21 @@ const GRAVITY = 750 # Opposes jump force
 var jump_count = 0
 var max_jump_count = 2 # Should be 1, but I'm testing double jump
 
+var path_to_protagonist_node = "/root/World/Protagonist/"
+
+var idle_sprite_node_name = "IdleSprite/"
+var move_anim_node_name = "AnimatedSprite/"
+
 
 func _ready():
 	set_process(true)
 	set_process_input(true)
-	sprite_node = get_node("/root/World/Protagonist/IdleSprite")
+	sprite_node = get_node(path_to_protagonist_node + idle_sprite_node_name)
 
 
 func _process(delta):
+	move_remainder = Vector2(0, 0)
+	
 	speed_y = clamp(speed_y, speed_y, MAX_SPEED_Y)
 	speed_y += GRAVITY * delta # BUG - delta shouldn't be factored in twice, should it?
 	
@@ -41,7 +49,7 @@ func _process(delta):
 	velocity.y = speed_y * delta # BUG - this does not work perfectly with gravitational acceleration.
 	
 	# Movement
-	var move_remainder = move(velocity)
+	move_remainder += move(velocity)
 	
 	if is_colliding():
 		collide_normal = get_collision_normal()
@@ -50,7 +58,7 @@ func _process(delta):
 		if colliding_body.is_in_group("Enemies"):
 			if collide_normal == Vector2(0, -1):
 				print("Enemy head smashed")
-				bounce(BOUNCE_FORCE)
+				move_remainder += bounce(BOUNCE_FORCE, delta)
 			else:
 				print("You're toast!")
 			
@@ -98,5 +106,8 @@ func _input(event):
 		speed_x = MAX_SPEED_X
 	
 
-func bounce(force):
-	speed_y = force
+func bounce(force, delta):
+	# Needs to function more like code in _process(delta), ie throttle speed, etc.
+	# This doesn't counterract gravity
+	var bounce_speed_y = force * delta
+	return move(Vector2(0, bounce_speed_y))
