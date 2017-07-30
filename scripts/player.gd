@@ -1,4 +1,16 @@
-# LizardGame beta 1.0
+# Buglist
+# The Bugaroo Bug
+#	Replicable: yes
+#	Character becomes extra shaky when running against a slime.
+#	Particularly occurs when pushing from the right in my case.
+#	I glitched up on top of the slime from doing this.
+# The Didgeridoo Bug
+#	Replicable: no (not reliably)
+#	Character becomes shaky when standing still on the ground.
+#	Usually does not occur, but then sometimes, for no reason, it does occur.
+#	May be related to screen resolution.
+#	Luke may experience it the most often.
+#	Matthew has only experienced in once without an idea on how to replicate it.
 
 extends KinematicBody2D
 
@@ -9,7 +21,7 @@ var sprite_node # Safe to initialize in the _ready() function
 var direction = 0 # 0 = stationary, 1 = right, -1 = left
 var last_direction = 0 # The direction last moved, or the facing direction
 
-var move_remainder
+var move_remainder = Vector2(0, 0)
 var speed_x = 0
 var speed_y = 0
 var velocity = Vector2(0, 0)
@@ -17,11 +29,13 @@ var collide_normal
 
 var colliding_body
 
+# CLEANUP - A lot of these should not be constants
 const MAX_SPEED_X = 250 # Right now there is no acceleration, but I'd like to add a little bit back in
 const MAX_SPEED_Y = 300 # BUG - limits falling speed, not jump speed
+# FEAT - There should exist a max fall speed and a max "launch" speed
 
 const JUMP_FORCE = 420
-const BOUNCE_FORCE = 200 # Should change this to be dependant on the enemy
+const BOUNCE_FORCE = 420 # Should change this to be dependant on the enemy
 const GRAVITY = 750 # Opposes jump force
 
 var jump_count = 0
@@ -40,38 +54,43 @@ func _ready():
 
 
 func _process(delta):
-	move_remainder = Vector2(0, 0)
+	#move_remainder = Vector2(0, 0)
 	
 	speed_y = clamp(speed_y, speed_y, MAX_SPEED_Y)
-	speed_y += GRAVITY * delta # BUG - delta shouldn't be factored in twice, should it?
+	speed_y += GRAVITY * delta
 	
 	velocity.x = speed_x * delta * direction
 	velocity.y = speed_y * delta # BUG - this does not work perfectly with gravitational acceleration.
 	
 	# Movement
-	move_remainder += move(velocity)
+	move_remainder = move(velocity)
 	
 	if is_colliding():
 		collide_normal = get_collision_normal()
 		colliding_body = get_collider()
 		
-		if colliding_body.is_in_group("Enemies"):
-			if collide_normal == Vector2(0, -1):
-				print("Enemy head smashed")
-				move_remainder += bounce(BOUNCE_FORCE, delta)
-			else:
-				print("You're toast!")
-			
 		velocity = collide_normal.slide(move_remainder)
 		move(velocity)
 		
-		if collide_normal == Vector2(0, -1): # Can't land on a sloped surface to refill jump_count
-			jump_count = 0
-		
-		speed_y = collide_normal.slide(Vector2(0, speed_y)).y
-		# This keeps falling speed from accumulating where it shouldn't (eg. on the ground).
-		# Possible BUG - it may mean that walking up slopes makes the character move slower, which isn't desired.
-		# It may also mean that you cannot run up slopes, not sure
+		if colliding_body.is_in_group("Enemies"): # Should be done with signalling instead
+			if collide_normal == Vector2(0, -1): # Landed from above
+				print("Enemy head smashed")
+				speed_y = -BOUNCE_FORCE # Fixed bounciness, no matter the fall distance
+				jump_count = 1
+			else:
+				print("You're toast!")
+				speed_y = collide_normal.slide(Vector2(0, speed_y)).y
+				# This line may be the cause of a BUG.
+				# I am calling it the Bugaroo Bug for no apparent reason. See above.
+			
+		else:
+			if collide_normal == Vector2(0, -1): # Can't land on a sloped surface to refill jump_count
+				jump_count = 0
+			
+			speed_y = collide_normal.slide(Vector2(0, speed_y)).y
+			# This keeps falling speed from accumulating where it shouldn't (eg. on the ground).
+			# Possible BUG - it may mean that walking up slopes makes the character move slower, which isn't desired.
+			# It may also mean that you cannot run up slopes, not sure
 		
 	elif jump_count == 0: # If player fell off a ledge
 		jump_count = 1
@@ -104,10 +123,3 @@ func _input(event):
 	
 	if direction:
 		speed_x = MAX_SPEED_X
-	
-
-func bounce(force, delta):
-	# Needs to function more like code in _process(delta), ie throttle speed, etc.
-	# This doesn't counterract gravity
-	var bounce_speed_y = force * delta
-	return move(Vector2(0, bounce_speed_y))
