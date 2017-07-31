@@ -35,7 +35,7 @@ const MAX_SPEED_Y = 300 # BUG - limits falling speed, not jump speed
 # FEAT - There should exist a max fall speed and a max "launch" speed
 
 const JUMP_FORCE = 420
-const BOUNCE_FORCE = 420 # Should change this to be dependant on the enemy
+const BOUNCE_FORCE = 300 # Should change this to be dependant on the enemy
 const GRAVITY = 750 # Opposes jump force
 
 var jump_count = 0
