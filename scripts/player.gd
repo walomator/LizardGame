@@ -15,13 +15,14 @@
 # Running Man Bug
 #	Replicable: yes
 #	Sprites for protagonist's running animation don't align with idle
-	
+
 
 extends KinematicBody2D
 
 var debug = 1
 
-var sprite_node # Safe to initialize in the _ready() function
+var idle_sprite_node # Safe to initialize in the _ready() function
+var move_anim_node
 var scoreboard_node
 
 signal attacked_enemy
@@ -38,7 +39,7 @@ var collide_normal
 
 var colliding_body
 
-var is_running = false
+var is_running = false # Running implies specifically FAST running, to be considered if there will be multiple speeds
 
 # CLEANUP - A lot of these should not be constants
 const MAX_SPEED_X = 250 # Right now there is no acceleration, but I'd like to add a little bit back in
@@ -63,7 +64,8 @@ var move_anim_node_name = "AnimatedSprite/"
 func _ready():
 	set_process(true)
 	set_process_input(true)
-	sprite_node = get_node(path_to_protagonist_node + idle_sprite_node_name)
+	idle_sprite_node = get_node(path_to_protagonist_node + idle_sprite_node_name)
+	move_anim_node =  get_node(path_to_protagonist_node + move_anim_node_name)
 	scoreboard_node = get_node(path_to_scoreboard_node)
 	self.connect("attacked_enemy", scoreboard_node, "handle_attacked_enemy", [])
 	self.connect("bumped_enemy", scoreboard_node, "handle_bumped_enemy", [])
@@ -118,7 +120,7 @@ func _process(delta):
 func _input(event):
 	if direction:
 		last_direction = direction
-		is_running = true
+		is_running = true # Will be 1 cycle out of date with reality
 	else:
 		is_running = false
 	
@@ -126,11 +128,11 @@ func _input(event):
 	if event.is_action_pressed("ui_right"):
 		print("right")
 		direction = 1
-		sprite_node.set_flip_h(false)
+		flip_sprite(false, is_running)
 	elif event.is_action_pressed("ui_left"):
 		print("left")
 		direction = -1
-		sprite_node.set_flip_h(true)
+		flip_sprite(true, is_running)
 	elif (event.is_action_released("ui_right") and direction == 1) or (event.is_action_released("ui_left") and direction == -1):
 		print("stopped")
 		direction = 0
@@ -144,3 +146,10 @@ func _input(event):
 	
 	if direction:
 		speed_x = MAX_SPEED_X
+
+
+func flip_sprite(is_flipped, player_is_running):
+	if player_is_running:
+		move_anim_node.set_flip_h(is_flipped)
+	else:
+		idle_sprite_node.set_flip_h(is_flipped)
