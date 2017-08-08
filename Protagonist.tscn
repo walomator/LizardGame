@@ -39,6 +39,7 @@ script/script = ExtResource( 1 )
 
 [node name="IdleSprite" type="Sprite" parent="."]
 
+visibility/visible = false
 texture = ExtResource( 2 )
 __meta__ = {
 "_edit_lock_": true
@@ -53,9 +54,9 @@ _update_shape_index = 0
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
 
-visibility/visible = false
 frames = SubResource( 2 )
 animation = "default"
-frame = 6
+frame = 4
+playing = true
 
 

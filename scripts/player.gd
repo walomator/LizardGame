@@ -1,22 +1,31 @@
 # Buglist
 # The Bugaroo Bug
-#	Replicable: yes
+#	Replicable: sometimes
 #	Character becomes extra shaky when running against a slime.
 #	Particularly occurs when pushing from the right in my case.
-#	I glitched up on top of the slime from doing this.
+#	Matthew glitched up on top of the slime from doing this from laptop.
+#	Could not replicate on desktop
 # The Didgeridoo Bug
 #	Replicable: no (not reliably)
 #	Character becomes shaky when standing still on the ground.
 #	Usually does not occur, but then sometimes, for no reason, it does occur.
 #	May be related to screen resolution.
 #	Luke may experience it the most often.
-#	Matthew has only experienced in once without an idea on how to replicate it.
+#	Matthew has experienced it on desktop and laptop.
+# Running Man Bug
+#	Replicable: yes
+#	Sprites for protagonist's running animation don't align with idle
+	
 
 extends KinematicBody2D
 
 var debug = 1
 
 var sprite_node # Safe to initialize in the _ready() function
+var scoreboard_node
+
+signal attacked_enemy
+signal bumped_enemy
 
 var direction = 0 # 0 = stationary, 1 = right, -1 = left
 var last_direction = 0 # The direction last moved, or the facing direction
@@ -28,6 +37,8 @@ var velocity = Vector2(0, 0)
 var collide_normal
 
 var colliding_body
+
+var is_running = false
 
 # CLEANUP - A lot of these should not be constants
 const MAX_SPEED_X = 250 # Right now there is no acceleration, but I'd like to add a little bit back in
@@ -42,6 +53,8 @@ var jump_count = 0
 var max_jump_count = 2 # Should be 1, but I'm testing double jump
 
 var path_to_protagonist_node = "/root/World/Protagonist/"
+var path_to_scoreboard_node = "/root/World/Scoreboard/"
+# Not sure if there is a reason to make the paths to nodes a variable if they are only used once
 
 var idle_sprite_node_name = "IdleSprite/"
 var move_anim_node_name = "AnimatedSprite/"
@@ -51,6 +64,9 @@ func _ready():
 	set_process(true)
 	set_process_input(true)
 	sprite_node = get_node(path_to_protagonist_node + idle_sprite_node_name)
+	scoreboard_node = get_node(path_to_scoreboard_node)
+	self.connect("attacked_enemy", scoreboard_node, "handle_attacked_enemy", [])
+	self.connect("bumped_enemy", scoreboard_node, "handle_bumped_enemy", [])
 
 
 func _process(delta):
@@ -74,11 +90,13 @@ func _process(delta):
 		
 		if colliding_body.is_in_group("Enemies"): # Should be done with signalling instead
 			if collide_normal == Vector2(0, -1): # Landed from above
-				print("Enemy head smashed")
+#				print("Enemy head smashed")
+				emit_signal("attacked_enemy")
 				speed_y = -BOUNCE_FORCE # Fixed bounciness, no matter the fall distance
 				jump_count = 1
 			else:
-				print("You're toast!")
+#				print("You're toast!")
+				emit_signal("bumped_enemy")
 				speed_y = collide_normal.slide(Vector2(0, speed_y)).y
 				# This line may be the cause of a BUG.
 				# I am calling it the Bugaroo Bug for no apparent reason. See above.
@@ -100,6 +118,9 @@ func _process(delta):
 func _input(event):
 	if direction:
 		last_direction = direction
+		is_running = true
+	else:
+		is_running = false
 	
 	# Input
 	if event.is_action_pressed("ui_right"):
