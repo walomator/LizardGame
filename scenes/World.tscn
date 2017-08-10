@@ -89,7 +89,7 @@ _update_shape_index = 0
 transform/pos = Vector2( -5, 16 )
 frames = SubResource( 2 )
 animation = "default"
-frame = 8
+frame = 3
 playing = true
 
 [node name="Area2D" type="Area2D" parent="Mob1"]
