@@ -2,19 +2,20 @@
 # The Bugaroo Bug
 #	Replicable: sometimes
 #	Character becomes extra shaky when running against a slime.
-#	Particularly occurs when pushing from the right in my case.
-#	Matthew glitched up on top of the slime from doing this from laptop.
-#	Could not replicate on desktop
+#	Sometimes a vertical shakiness, sometimes a horizontal shakiness.
+#	Matthew: glitched up on top of the slime from doing this from laptop.
+#	Matthew: horizontal shakiness experienced on desktop, vertical shakiness on laptop
 # The Didgeridoo Bug
 #	Replicable: no (not reliably)
 #	Character becomes shaky when standing still on the ground.
 #	Usually does not occur, but then sometimes, for no reason, it does occur.
 #	May be related to screen resolution.
-#	Luke may experience it the most often.
-#	Matthew has experienced it on desktop and laptop.
+#	Matthew: Luke may experience it the most often.
+#	Matthew: has experienced it on desktop and laptop.
 # Running Man Bug
 #	Replicable: yes
 #	Sprites for protagonist's running animation don't align with idle
+#	Fix: edit animation frames
 
 
 extends KinematicBody2D
@@ -68,7 +69,7 @@ func _ready():
 	move_anim_node =  get_node(path_to_protagonist_node + move_anim_node_name)
 	scoreboard_node = get_node(path_to_scoreboard_node)
 	self.connect("attacked_enemy", scoreboard_node, "handle_attacked_enemy", [])
-#	self.connect("bumped_enemy", scoreboard_node, "handle_bumped_enemy", [])
+	self.connect("bumped_enemy", scoreboard_node, "handle_bumped_enemy", [])
 
 
 func _process(delta):
@@ -92,12 +93,10 @@ func _process(delta):
 		
 		if colliding_body.is_in_group("Enemies"): # Should be done with signalling instead
 			if collide_normal == Vector2(0, -1): # Landed from above
-#				print("Enemy head smashed")
 				emit_signal("attacked_enemy")
 				speed_y = -BOUNCE_FORCE # Fixed bounciness, no matter the fall distance
 				jump_count = 1
 			else:
-#				print("You're toast!")
 				emit_signal("bumped_enemy")
 				speed_y = collide_normal.slide(Vector2(0, speed_y)).y
 				# This line may be the cause of a BUG.
@@ -150,17 +149,8 @@ func _input(event):
 
 
 func flip_sprite(is_flipped, player_is_running):
-	# It is fairly unnecessary to check if the player is moving before flipping. Maybe it won't always be.
-	if player_is_running:
-#		move_anim_node.set_hidden(false)
-#		idle_sprite_node.set_hidden(true)
-		move_anim_node.set_flip_h(is_flipped)
-		print("player is running at time of flip_sprite call")
-	else:
-#		idle_sprite_node.set_hidden(false)
-#		move_anim_node.set_hidden(true)
-		idle_sprite_node.set_flip_h(is_flipped)
-		print("player is still at time of flip_sprite call")
+	move_anim_node.set_flip_h(is_flipped)
+	idle_sprite_node.set_flip_h(is_flipped)
 	
 
 func set_direction(player_direction):
@@ -173,7 +163,7 @@ func set_direction(player_direction):
 	if player_direction == "still":
 		direction = 0
 		is_running = false
-	print("is_running set to ", is_running)
+#	print("is_running set to ", is_running)
 	if is_running:
 		move_anim_node.set_hidden(false)
 		idle_sprite_node.set_hidden(true)
