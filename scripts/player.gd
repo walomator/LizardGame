@@ -68,7 +68,7 @@ func _ready():
 	move_anim_node =  get_node(path_to_protagonist_node + move_anim_node_name)
 	scoreboard_node = get_node(path_to_scoreboard_node)
 	self.connect("attacked_enemy", scoreboard_node, "handle_attacked_enemy", [])
-	self.connect("bumped_enemy", scoreboard_node, "handle_bumped_enemy", [])
+#	self.connect("bumped_enemy", scoreboard_node, "handle_bumped_enemy", [])
 
 
 func _process(delta):
@@ -120,22 +120,23 @@ func _process(delta):
 func _input(event):
 	if direction:
 		last_direction = direction
-		is_running = true # Will be 1 cycle out of date with reality
-	else:
-		is_running = false
+		# last_direction currently does nothing
 	
 	# Input
 	if event.is_action_pressed("ui_right"):
 		print("right")
-		direction = 1
+#		direction = 1
+		set_direction("right")
 		flip_sprite(false, is_running)
 	elif event.is_action_pressed("ui_left"):
 		print("left")
-		direction = -1
+#		direction = -1
+		set_direction("left")
 		flip_sprite(true, is_running)
 	elif (event.is_action_released("ui_right") and direction == 1) or (event.is_action_released("ui_left") and direction == -1):
 		print("stopped")
-		direction = 0
+#		direction = 0
+		set_direction("still")
 	
 	if event.is_action_pressed("ui_up") and jump_count < max_jump_count:
 		print("jump")
@@ -149,7 +150,33 @@ func _input(event):
 
 
 func flip_sprite(is_flipped, player_is_running):
+	# It is fairly unnecessary to check if the player is moving before flipping. Maybe it won't always be.
 	if player_is_running:
+#		move_anim_node.set_hidden(false)
+#		idle_sprite_node.set_hidden(true)
 		move_anim_node.set_flip_h(is_flipped)
+		print("player is running at time of flip_sprite call")
 	else:
+#		idle_sprite_node.set_hidden(false)
+#		move_anim_node.set_hidden(true)
 		idle_sprite_node.set_flip_h(is_flipped)
+		print("player is still at time of flip_sprite call")
+	
+
+func set_direction(player_direction):
+	if player_direction == "right":
+		direction = 1
+		is_running = true
+	if player_direction == "left":
+		direction = -1
+		is_running = true
+	if player_direction == "still":
+		direction = 0
+		is_running = false
+	print("is_running set to ", is_running)
+	if is_running:
+		move_anim_node.set_hidden(false)
+		idle_sprite_node.set_hidden(true)
+	else:
+		idle_sprite_node.set_hidden(false)
+		move_anim_node.set_hidden(true)
