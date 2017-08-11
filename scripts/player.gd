@@ -40,7 +40,9 @@ var collide_normal
 
 var colliding_body
 
-var is_running = false # Running implies specifically FAST running, to be considered if there will be multiple speeds
+var is_moving = false # Running implies specifically FAST running, to be considered if there will be multiple speeds
+var movement_mode = "idle"
+var is_grounded
 
 # CLEANUP - A lot of these should not be constants
 const MAX_SPEED_X = 250 # Right now there is no acceleration, but I'd like to add a little bit back in
@@ -126,12 +128,12 @@ func _input(event):
 		print("right")
 #		direction = 1
 		set_direction("right")
-		flip_sprite(false, is_running)
+		flip_sprite(false, is_moving)
 	elif event.is_action_pressed("ui_left"):
 		print("left")
 #		direction = -1
 		set_direction("left")
-		flip_sprite(true, is_running)
+		flip_sprite(true, is_moving)
 	elif (event.is_action_released("ui_right") and direction == 1) or (event.is_action_released("ui_left") and direction == -1):
 		print("stopped")
 #		direction = 0
@@ -148,7 +150,7 @@ func _input(event):
 		speed_x = MAX_SPEED_X
 
 
-func flip_sprite(is_flipped, player_is_running):
+func flip_sprite(is_flipped, player_is_moving):
 	move_anim_node.set_flip_h(is_flipped)
 	idle_sprite_node.set_flip_h(is_flipped)
 	
@@ -156,15 +158,15 @@ func flip_sprite(is_flipped, player_is_running):
 func set_direction(player_direction):
 	if player_direction == "right":
 		direction = 1
-		is_running = true
+		is_moving = true
 	if player_direction == "left":
 		direction = -1
-		is_running = true
+		is_moving = true
 	if player_direction == "still":
 		direction = 0
-		is_running = false
-#	print("is_running set to ", is_running)
-	if is_running:
+		is_moving = false
+#	print("is_moving set to ", is_moving)
+	if is_moving:
 		move_anim_node.set_hidden(false)
 		idle_sprite_node.set_hidden(true)
 	else:
