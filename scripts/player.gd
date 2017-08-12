@@ -22,7 +22,7 @@ extends KinematicBody2D
 
 var debug = 1
 
-var fireball_scene = preload("scenes/Fireball.tscn")
+var fireball_scene = preload("res://scenes/Fireball.tscn")
 
 var idle_sprite_node # Safe to initialize in the _ready() function
 var move_anim_node
