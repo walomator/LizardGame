@@ -22,6 +22,8 @@ extends KinematicBody2D
 
 var debug = 1
 
+var fireball_scene = preload("scenes/Fireball.tscn")
+
 var idle_sprite_node # Safe to initialize in the _ready() function
 var move_anim_node
 var scoreboard_node
@@ -143,7 +145,7 @@ func _input(event):
 		speed_x = MAX_SPEED_X
 	
 	if event.is_action_pressed("reset"):
-		self.set_pos(Vector2(start_pos_x, start_pos_y))
+		reset_position()
 
 
 func flip_sprite(is_flipped, player_is_moving):
@@ -175,6 +177,12 @@ func set_direction(player_direction):
 		move_anim_node.set_hidden(true)
 	
 
+func reset_position():
+	self.set_pos(Vector2(start_pos_x, start_pos_y))
+	speed_x = 0
+	speed_y = 0
+	
+
 func handle_enemy_collision():
 	if collide_normal == Vector2(0, -1): # Landed from above
 		emit_signal("attacked_enemy")
@@ -185,3 +193,8 @@ func handle_enemy_collision():
 		speed_y = collide_normal.slide(Vector2(0, speed_y)).y
 		# This line may be the cause of a BUG.
 		# I am calling it the Bugaroo Bug for no apparent reason. See above.
+	
+
+func launch_particle(particle_type):
+	if particle_type == "fireball":
+		pass
