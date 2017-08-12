@@ -31,7 +31,8 @@ signal bumped_enemy
 
 var direction = 0 # 0 = stationary, 1 = right, -1 = left
 var last_direction = 0 # The direction last moved, or the facing direction
-
+var start_pos_x = 128
+var start_pos_y = 128
 var move_remainder = Vector2(0, 0)
 var speed_x = 0
 var speed_y = 0
@@ -87,6 +88,7 @@ func _process(delta):
 	move_remainder = move(velocity)
 	
 	if is_colliding():
+		is_grounded = true
 		collide_normal = get_collision_normal()
 		colliding_body = get_collider()
 		
@@ -94,27 +96,22 @@ func _process(delta):
 		move(velocity)
 		
 		if colliding_body.is_in_group("Enemies"): # Should be done with signalling instead
-			if collide_normal == Vector2(0, -1): # Landed from above
-				emit_signal("attacked_enemy")
-				speed_y = -BOUNCE_FORCE # Fixed bounciness, no matter the fall distance
-				jump_count = 1
-			else:
-				emit_signal("bumped_enemy")
-				speed_y = collide_normal.slide(Vector2(0, speed_y)).y
-				# This line may be the cause of a BUG.
-				# I am calling it the Bugaroo Bug for no apparent reason. See above.
-			
+			handle_enemy_collision()
 		else:
 			if collide_normal == Vector2(0, -1): # Can't land on a sloped surface to refill jump_count
 				jump_count = 0
+			else:
+				is_grounded = false
 			
 			speed_y = collide_normal.slide(Vector2(0, speed_y)).y
 			# This keeps falling speed from accumulating where it shouldn't (eg. on the ground).
 			# Possible BUG - it may mean that walking up slopes makes the character move slower, which isn't desired.
 			# It may also mean that you cannot run up slopes, not sure
 		
-	elif jump_count == 0: # If player fell off a ledge
-		jump_count = 1
+	else:
+		is_grounded = false
+		if jump_count == 0: # If player fell off a ledge
+			jump_count = 1
 	# End if is_colliding()
 
 
@@ -126,28 +123,27 @@ func _input(event):
 	# Input
 	if event.is_action_pressed("ui_right"):
 		print("right")
-#		direction = 1
 		set_direction("right")
 		flip_sprite(false, is_moving)
 	elif event.is_action_pressed("ui_left"):
 		print("left")
-#		direction = -1
 		set_direction("left")
 		flip_sprite(true, is_moving)
 	elif (event.is_action_released("ui_right") and direction == 1) or (event.is_action_released("ui_left") and direction == -1):
 		print("stopped")
-#		direction = 0
 		set_direction("still")
 	
 	if event.is_action_pressed("ui_up") and jump_count < max_jump_count:
 		print("jump")
 		speed_y = -JUMP_FORCE
-		
 		jump_count += 1
 		# FEAT - Variable jump length should be a feature later
 	
 	if direction:
 		speed_x = MAX_SPEED_X
+	
+	if event.is_action_pressed("reset"):
+		self.set_pos(Vector2(start_pos_x, start_pos_y))
 
 
 func flip_sprite(is_flipped, player_is_moving):
@@ -166,9 +162,26 @@ func set_direction(player_direction):
 		direction = 0
 		is_moving = false
 #	print("is_moving set to ", is_moving)
-	if is_moving:
-		move_anim_node.set_hidden(false)
-		idle_sprite_node.set_hidden(true)
+	if is_grounded:
+		if is_moving:
+			move_anim_node.set_hidden(false)
+			idle_sprite_node.set_hidden(true)
+		else:
+			idle_sprite_node.set_hidden(false)
+			move_anim_node.set_hidden(true)
 	else:
+		# Should be an animated sprite
 		idle_sprite_node.set_hidden(false)
 		move_anim_node.set_hidden(true)
+	
+
+func handle_enemy_collision():
+	if collide_normal == Vector2(0, -1): # Landed from above
+		emit_signal("attacked_enemy")
+		speed_y = -BOUNCE_FORCE # Fixed bounciness, no matter the fall distance
+		jump_count = 1
+	else:
+		emit_signal("bumped_enemy")
+		speed_y = collide_normal.slide(Vector2(0, speed_y)).y
+		# This line may be the cause of a BUG.
+		# I am calling it the Bugaroo Bug for no apparent reason. See above.
