@@ -90,7 +90,7 @@ _update_shape_index = 0
 transform/pos = Vector2( -5, 16 )
 frames = SubResource( 2 )
 animation = "default"
-frame = 11
+frame = 9
 playing = true
 
 [node name="Area2D" type="Area2D" parent="Mob1"]
@@ -118,7 +118,9 @@ lines_skipped = 0
 max_lines_visible = -1
 script/script = ExtResource( 15 )
 
-[node name="KinematicBody2D" parent="." instance=ExtResource( 16 )]
+[node name="Goblin" parent="." groups=[
+"Enemies",
+] instance=ExtResource( 16 )]
 
 transform/pos = Vector2( 669, 128 )
 
