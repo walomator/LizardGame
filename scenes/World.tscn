@@ -39,13 +39,8 @@ visibility/behind_parent = true
 
 transform/pos = Vector2( 128, 128 )
 
-[node name="map0" parent="." instance=ExtResource( 2 )]
+[node name="Camera2D" type="Camera2D" parent="Protagonist"]
 
-visibility/behind_parent = true
-
-[node name="Camera2D" type="Camera2D" parent="."]
-
-transform/pos = Vector2( 512, 304 )
 anchor_mode = 1
 rotating = false
 current = true
@@ -62,6 +57,10 @@ drag_margin/left = 0.2
 drag_margin/top = 0.2
 drag_margin/right = 0.2
 drag_margin/bottom = 0.2
+
+[node name="map0" parent="." instance=ExtResource( 2 )]
+
+visibility/behind_parent = true
 
 [node name="Mob1" type="KinematicBody2D" parent="." groups=[
 "Enemies",
@@ -90,7 +89,7 @@ _update_shape_index = 0
 transform/pos = Vector2( -5, 16 )
 frames = SubResource( 2 )
 animation = "default"
-frame = 7
+frame = 9
 playing = true
 
 [node name="Area2D" type="Area2D" parent="Mob1"]
