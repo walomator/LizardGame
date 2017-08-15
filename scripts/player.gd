@@ -30,6 +30,7 @@ var scoreboard_node
 
 signal attacked_enemy
 signal bumped_enemy
+signal bumped_end_level
 
 var direction = 0 # 0 = stationary, 1 = right, -1 = left
 var last_direction = 0 # The direction last moved, or the facing direction
@@ -75,6 +76,7 @@ func _ready():
 	scoreboard_node = get_node(path_to_scoreboard_node)
 	self.connect("attacked_enemy", scoreboard_node, "handle_attacked_enemy", [])
 	self.connect("bumped_enemy", scoreboard_node, "handle_bumped_enemy", [])
+	self.connect("bumped_end_level", scoreboard_node, "handle_bumped_end_level", [])
 
 
 func _process(delta):
@@ -99,6 +101,8 @@ func _process(delta):
 		
 		if colliding_body.is_in_group("Enemies"): # Should be done with signalling instead
 			handle_enemy_collision()
+		elif colliding_body.is_in_group("EndLevel"):
+			handle_flag_collision("EndLevel")
 		else:
 			if collide_normal == Vector2(0, -1): # Can't land on a sloped surface to refill jump_count
 				jump_count = 0
@@ -146,7 +150,7 @@ func _input(event):
 	
 	if event.is_action_pressed("reset"):
 		reset_position()
-
+	
 
 func flip_sprite(is_flipped, player_is_moving):
 	move_anim_node.set_flip_h(is_flipped)
@@ -193,6 +197,11 @@ func handle_enemy_collision():
 		speed_y = collide_normal.slide(Vector2(0, speed_y)).y
 		# This line may be the cause of a BUG.
 		# I am calling it the Bugaroo Bug for no apparent reason. See above.
+	
+
+func handle_flag_collision(flag_name):
+	if flag_name == "EndLevel":
+		emit_signal("bumped_end_level")
 	
 
 func launch_particle(particle_type):

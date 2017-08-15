@@ -12,7 +12,11 @@ func _ready():
 
 func handle_attacked_enemy():
 	print("Enemy head smashed")
-
+	
 
 func handle_bumped_enemy():
 	print("You're toast!")
+	
+
+func handle_bumped_end_level():
+	print("Level complete!")
