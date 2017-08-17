@@ -1,6 +1,6 @@
 [gd_scene load_steps=19 format=1]
 
-[ext_resource path="res://scenes/maps/map-test.scn" type="PackedScene" id=1]
+[ext_resource path="res://scenes/map-test.scn" type="PackedScene" id=1]
 [ext_resource path="res://Protagonist.tscn" type="PackedScene" id=2]
 [ext_resource path="res://textures/monsters/slime/idle-animation/1.png" type="Texture" id=3]
 [ext_resource path="res://textures/monsters/slime/idle-animation/2.png" type="Texture" id=4]
@@ -94,7 +94,7 @@ _update_shape_index = 0
 transform/pos = Vector2( -5, 16 )
 frames = SubResource( 2 )
 animation = "default"
-frame = 2
+frame = 8
 playing = true
 __meta__ = {
 "_edit_lock_": true
