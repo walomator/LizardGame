@@ -151,6 +151,9 @@ func _input(event):
 	if event.is_action_pressed("reset"):
 		reset_position()
 	
+	if event.is_action_pressed("combat_action_1"):
+		launch_particle("fireball")
+	
 
 func flip_sprite(is_flipped, player_is_moving):
 	move_anim_node.set_flip_h(is_flipped)
@@ -206,4 +209,8 @@ func handle_flag_collision(flag_name):
 
 func launch_particle(particle_type):
 	if particle_type == "fireball":
-		pass
+		print("Fireball instanced")
+		var particle = fireball_scene.instance()
+		get_tree().get_root().add_child(particle)
+		particle.set_direction(1)
+		particle.set_pos(get_pos()) # Not really centered
