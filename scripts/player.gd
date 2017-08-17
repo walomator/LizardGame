@@ -33,7 +33,7 @@ signal bumped_enemy
 signal bumped_end_level
 
 var direction = 0 # 0 = stationary, 1 = right, -1 = left
-var last_direction = 0 # The direction last moved, or the facing direction
+var last_direction = 1 # The direction last moved, or the facing direction
 var start_pos_x = 128
 var start_pos_y = 128
 var move_remainder = Vector2(0, 0)
@@ -159,8 +159,29 @@ func flip_sprite(is_flipped, player_is_moving):
 	move_anim_node.set_flip_h(is_flipped)
 	idle_sprite_node.set_flip_h(is_flipped)
 	
+func get_direction():
+	var player_direction
+	if direction == 1:
+		player_direction = "right"
+	elif direction == -1:
+		player_direction = "left"
+	elif direction == 0:
+		player_direction = "still"
+	return player_direction
+	
+
+func get_last_direction():
+	print(last_direction)
+	var player_direction = "still"
+	if last_direction == 1:
+		player_direction = "right"
+	elif last_direction == -1:
+		player_direction = "left"
+	return player_direction
+	
 
 func set_direction(player_direction):
+	# Should be a simpler setter that calls a handle_change_direction
 	if player_direction == "right":
 		direction = 1
 		is_moving = true
@@ -170,7 +191,6 @@ func set_direction(player_direction):
 	if player_direction == "still":
 		direction = 0
 		is_moving = false
-#	print("is_moving set to ", is_moving)
 	if is_grounded:
 		if is_moving:
 			move_anim_node.set_hidden(false)
@@ -209,8 +229,8 @@ func handle_flag_collision(flag_name):
 
 func launch_particle(particle_type):
 	if particle_type == "fireball":
-		print("Fireball instanced")
 		var particle = fireball_scene.instance()
 		get_tree().get_root().add_child(particle)
-		particle.set_direction(1)
+		particle.set_direction(self.get_last_direction())
+		particle.set_spawner("Protagonist")
 		particle.set_pos(get_pos()) # Not really centered
