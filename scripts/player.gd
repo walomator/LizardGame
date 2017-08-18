@@ -125,7 +125,6 @@ func _process(delta):
 func _input(event):
 	if direction:
 		last_direction = direction
-		# last_direction currently does nothing
 	
 	# Input
 	if event.is_action_pressed("ui_right"):
@@ -160,6 +159,7 @@ func flip_sprite(is_flipped, player_is_moving):
 	move_anim_node.set_flip_h(is_flipped)
 	idle_sprite_node.set_flip_h(is_flipped)
 	
+
 func get_direction():
 	var player_direction
 	if direction == 1:
@@ -172,7 +172,6 @@ func get_direction():
 	
 
 func get_last_direction():
-	print(last_direction)
 	var player_direction = "still"
 	if last_direction == 1:
 		player_direction = "right"
@@ -231,6 +230,7 @@ func handle_flag_collision(flag_object):
 func handle_item_collision(item_object):
 	if item_object.is_in_group("Potion"):
 		print("No more room for potions!")
+	
 
 func launch_particle(particle_type):
 	if particle_type == "fireball":

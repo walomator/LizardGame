@@ -10,7 +10,7 @@ var extinguish_time = 5
 
 func _ready():
 	set_process(true)
-
+	
 
 func _process(delta):
 	if direction:
