@@ -31,3 +31,8 @@ func handle_bumped_end_level():
 	get_node("/root/World/Protagonist/Camera2D/Sprite").set_hidden(false)
 	_write_scoreboard("Level complete!")
 	score_locked = true
+	
+
+func handle_obtained_potion():
+	print("The potion has been pocketed.")
+	_update_score(score + 25)
