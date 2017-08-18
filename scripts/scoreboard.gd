@@ -20,3 +20,4 @@ func handle_bumped_enemy():
 
 func handle_bumped_end_level():
 	print("Level complete!")
+	get_node("/root/World/Protagonist/Camera2D/Sprite").set_hidden(false)
