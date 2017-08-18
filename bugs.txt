@@ -17,6 +17,9 @@ This is a "Bethesda-esque" framerate dependant bug. Big if true.
 If character presses on a collision object from the right, he will keep
 sprinting even when a movement key is not pressed.
 
+Protagonist's AnimatedSprite is playing, even if it is hidden, annoys version
+control users everywhere
+
 
 tilemaps
 Not a bug, but .tmx files won't load properly when you move dependency files.

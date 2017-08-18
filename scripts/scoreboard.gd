@@ -1,5 +1,7 @@
 extends Label
 
+# Problems: This is a score system that doesn't follow the player
+
 var score = 0
 var score_locked = false
 

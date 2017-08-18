@@ -74,6 +74,7 @@ func _ready():
 	idle_sprite_node = get_node(path_to_protagonist_node + idle_sprite_node_name)
 	move_anim_node =  get_node(path_to_protagonist_node + move_anim_node_name)
 	scoreboard_node = get_node(path_to_scoreboard_node)
+	print(scoreboard_node)
 	self.connect("attacked_enemy", scoreboard_node, "handle_attacked_enemy", [])
 	self.connect("bumped_enemy", scoreboard_node, "handle_bumped_enemy", [])
 	self.connect("bumped_end_level", scoreboard_node, "handle_bumped_end_level", [])
