@@ -80,8 +80,6 @@ func _ready():
 
 
 func _process(delta):
-	#move_remainder = Vector2(0, 0)
-	
 	speed_y = clamp(speed_y, speed_y, MAX_SPEED_Y)
 	speed_y += GRAVITY * delta
 	
@@ -101,9 +99,12 @@ func _process(delta):
 		
 		if colliding_body.is_in_group("Enemies"): # Should be done with signalling instead
 			handle_enemy_collision()
-		elif colliding_body.is_in_group("EndLevel"):
-			handle_flag_collision("EndLevel")
+		elif colliding_body.is_in_group("Flag"):
+			handle_flag_collision(colliding_body)
+		elif colliding_body.is_in_group("Item"):
+			handle_item_collision(colliding_body)
 		else:
+			# This should be in a function run conditionally if the colliding object doesn't do something else like bounce the player
 			if collide_normal == Vector2(0, -1): # Can't land on a sloped surface to refill jump_count
 				jump_count = 0
 			else:
@@ -222,10 +223,14 @@ func handle_enemy_collision():
 		# I am calling it the Bugaroo Bug for no apparent reason. See above.
 	
 
-func handle_flag_collision(flag_name):
-	if flag_name == "EndLevel":
+func handle_flag_collision(flag_object):
+	if flag_object.is_in_group("EndLevel"):
 		emit_signal("bumped_end_level")
 	
+
+func handle_item_collision(item_object):
+	if item_object.is_in_group("Potion"):
+		print("No more room for potions!")
 
 func launch_particle(particle_type):
 	if particle_type == "fireball":
