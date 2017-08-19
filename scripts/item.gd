@@ -21,3 +21,5 @@ func handle_body_enter(entered_body):
 func handle_looting(entered_body):
 	if self.is_in_group("Potions"):
 		emit_signal("obtained_potion")
+	
+	self.queue_free()
