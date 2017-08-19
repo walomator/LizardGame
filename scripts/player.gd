@@ -194,16 +194,27 @@ func set_direction(player_direction):
 		is_moving = false
 	if is_grounded:
 		if is_moving:
-			move_anim_node.set_hidden(false)
-			idle_sprite_node.set_hidden(true)
+			switch_mode("moving")
 		else:
-			idle_sprite_node.set_hidden(false)
-			move_anim_node.set_hidden(true)
+			switch_mode("still")
 	else:
 		# Should be an animated sprite
+		switch_mode("air")
+	
+func switch_mode(character_mode):
+	if character_mode == "moving":
+		move_anim_node.play()
+		move_anim_node.set_hidden(false)
+		idle_sprite_node.set_hidden(true)
+	elif character_mode == "air": # Currently the same as "moving"
+		move_anim_node.play()
+		move_anim_node.set_hidden(false)
+		idle_sprite_node.set_hidden(true)
+	elif character_mode == "still":
+		move_anim_node.stop()
 		idle_sprite_node.set_hidden(false)
 		move_anim_node.set_hidden(true)
-	
+
 
 func reset_position():
 	self.set_pos(Vector2(start_pos_x, start_pos_y))
