@@ -28,7 +28,7 @@ func handle_bumped_enemy():
 	_update_score(0)
 	
 
-func handle_bumped_end_level():
+func handle_passed_end_level():
 	print("Level complete!")
 	get_node("/root/World/Protagonist/Camera2D/Sprite").set_hidden(false)
 	_write_scoreboard("Level complete!")

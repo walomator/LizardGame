@@ -17,8 +17,14 @@ This is a "Bethesda-esque" framerate dependant bug. Big if true.
 If character presses on a collision object from the right, he will keep
 sprinting even when a movement key is not pressed.
 
-Protagonist's AnimatedSprite is playing, even if it is hidden, annoys version
-control users everywhere
+Mob1's AnimatedSprite is playing in preview, annoys version control users across
+the nation
+
+Can fall through a ladder floor tile
+
+Victory splash follows player, not camera
+
+Maps imported from Tiled need significant retouching to work
 
 
 tilemaps
@@ -26,9 +32,11 @@ Not a bug, but .tmx files won't load properly when you move dependency files.
 This is a problem for sharing .tmx files, but isn't a bug of our own making.
 
 General:
-display
+lack of bug tracker
+lack of display settings
+viewport too small
 No pixel alignment
 No variable resolutions
 
 animation
-No animation
+Insufficient animation
