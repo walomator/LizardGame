@@ -27,9 +27,14 @@
 #				  potion
 # End			Defines a point where the level can be "won" (currently a flag)
 
-
 extends Node2D
 
 func _ready():
 	self.set_draw_behind_parent(true)
-	print("At least I'm working (signed me, the script)")
+	var objects = self.get_node("Objects")
+	for tiled_object in objects.get_children():
+		if "Potion" in tiled_object.get_name():
+			print("There is a potion to import.")
+		if "End" in tiled_object.get_name():
+			print("There is a flag to import.")
+	# End for
