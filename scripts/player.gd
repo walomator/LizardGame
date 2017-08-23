@@ -22,7 +22,7 @@ extends KinematicBody2D
 
 var debug = 1
 
-var fireball_scene = preload("res://scenes/Fireball.tscn")
+var fireball_scene = preload("res://scenes/effects/Fireball.tscn")
 
 var idle_sprite_node # Safe to initialize in the _ready() function
 var move_anim_node
@@ -100,10 +100,6 @@ func _process(delta):
 		
 		if colliding_body.is_in_group("Enemies"): # Should be done with signalling instead
 			handle_enemy_collision()
-#		elif colliding_body.is_in_group("Flags"):
-#			handle_flag_collision(colliding_body)
-#		elif colliding_body.is_in_group("Items"):
-#			handle_item_collision(colliding_body)
 		else:
 			# This should be in a function run conditionally if the colliding object doesn't do something else like bounce the player
 			if collide_normal == Vector2(0, -1): # Can't land on a sloped surface to refill jump_count
