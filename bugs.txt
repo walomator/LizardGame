@@ -3,6 +3,9 @@ In-line with commit:
 8 of branch movement
 
 Bugs:
+map-import
+TempSceneName.tscn is being saved, but not properly
+
 movement
 67 If both directions are held down, the first direction gets priority.
 This causes problems when a direction button is released.

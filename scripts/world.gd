@@ -1,6 +1,6 @@
 extends Node2D
 
-const import_map_mode = "scn"
+const import_map_mode = "vnen"
 const path_to_maps = "res://scenes/maps/"
 const current_map_name = "map-test"
 const path_to_current_map = path_to_maps + current_map_name + ".scn/"

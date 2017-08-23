@@ -63,7 +63,20 @@ tile_data = IntArray( 0, 4, 1, 4, 2, 4, 3, 4, 4, 4, 5, 4, 6, 4, 7, 4, 8, 4, 9, 4
 
 [node name="Objects" type="Node2D" parent="."]
 
-[node name="Potion" type="Node2D" parent="Objects"]
+[node name="Potion" type="StaticBody2D" parent="Objects"]
+
+transform/pos = Vector2( 224, 128 )
+transform/rot = 180.0
+input/pickable = false
+shapes/0/shape = SubResource( 1 )
+shapes/0/transform = Matrix32( 1, 0, 0, 1, -16, -16 )
+shapes/0/trigger = false
+collision/layers = 1
+collision/mask = 1
+constant_linear_velocity = Vector2( 0, 0 )
+constant_angular_velocity = 0.0
+friction = 1.0
+bounce = 0.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Objects/Potion"]
 

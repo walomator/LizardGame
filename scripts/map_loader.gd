@@ -36,18 +36,13 @@ const potion_scene = preload("res://scenes/items/Potion.tscn/")
 const end_level_scene = preload("res://scenes/effects/EndLevel.tscn/")
 const slime_scene = preload("res://scenes/monsters/slime/Slime.tscn/")
 const goblin_scene = preload("res://scenes/monsters/goblin/Goblin.tscn/")
-const test_scene = preload("res://scenes/Test.tscn")
-var potion_node = potion_scene.instance()
-var end_level_node = end_level_scene.instance()
-var slime_node = slime_scene.instance()
-var goblin_node = goblin_scene.instance()
-var test_node = test_scene.instance()
+#const test_scene = preload("res://scenes/Test.tscn")
 
 func _ready():
 	self.set_draw_behind_parent(true)
 	var objects = self.get_node("Objects")
 	for tiled_object in objects.get_children():
-		print(tiled_object.get_name())
+#		print(tiled_object.get_name())
 		if "Potion" in tiled_object.get_name():
 			print("There is a potion to import.")
 			set_potion(tiled_object)
@@ -74,32 +69,44 @@ func _ready():
 	
 
 func set_potion(tiled_object):
-	var object_pos = tiled_object.get_pos()
-	tiled_object.replace_by(potion_node)
+	_replace_object(tiled_object, potion_scene)
+#	tiled_object.replace_by(potion_node) # Only replaces one node with another, independent of children
 	
 	
 
 func set_flag(flag_name, tiled_object):
-	pass
-#	if flag_name == "End":
-#		tiled_object.add_child(end_level_node)
+	
+	if flag_name == "End":
+		_replace_object(tiled_object, end_level_scene)
 
 func set_monster(monster_name, tiled_object):
-	pass
-#	# Could a dictionary be used here?
-#	if monster_name == "Goblin":
-#		tiled_object.add_child(goblin_node)
-#	if monster_name == "Slime":
-#		tiled_object.add_child(slime_node)
+	# Could a dictionary be used here?
+	if monster_name == "Goblin":
+		_replace_object(tiled_object, goblin_scene)
+	if monster_name == "Slime":
+		_replace_object(tiled_object, slime_scene)
+
+#	var object_pos = tiled_object.get_node("CollisionShape2D").get_global_pos()
+#	tiled_object.queue_free()
+#	
+#	var slime_node = slime_scene.instance()
+#	self.add_child(slime_node)
+#	slime_node.set_pos(object_pos)
 	
 
-func save_scene(scene_save_path):
-	print("Actual current scene:")
-	print(get_node("/root/World/map-test"))
+func _replace_object(tiled_object, target_scene):
+	var object_pos = tiled_object.get_node("CollisionShape2D").get_global_pos()
+	tiled_object.queue_free()
 	
+	var target_node = target_scene.instance()
+	self.add_child(target_node)
+	target_node.set_pos(object_pos)
+
+func save_scene(scene_save_path):
 #	print("Packing current scene.")
 	var packed_scene = PackedScene.new()
-	packed_scene.pack(get_node("/root/World/map-test"))
+#	packed_scene.pack(get_node("/root/World/map-test"))
+	packed_scene.pack(self)
 	
 	ResourceSaver.save(scene_save_path, packed_scene)
 	
