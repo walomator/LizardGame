@@ -1,4 +1,4 @@
-extends StaticBody2D
+extends Node2D
 
 signal obtained_potion
 signal passed_end_level

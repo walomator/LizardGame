@@ -1,6 +1,9 @@
-[gd_scene load_steps=2 format=1]
+[gd_scene load_steps=5 format=1]
 
 [ext_resource path="res://scenes/maps/tilesets/map-test.res" type="TileSet" id=1]
+[ext_resource path="res://scenes/monsters/slime/Slime.tscn" type="PackedScene" id=2]
+[ext_resource path="res://scenes/items/potion/Potion.tscn" type="PackedScene" id=3]
+[ext_resource path="res://scenes/items/endlevel/EndLevel.tscn" type="PackedScene" id=4]
 
 [node name="map-test" type="Node2D"]
 
@@ -57,5 +60,21 @@ collision/layers = 1
 collision/mask = 1
 occluder/light_mask = 1
 tile_data = IntArray( 327740, 8, 393276, 8, 458812, 8, 524348, 8, 589884, 8, 655420, 8, 720956, 8, 786492, 8, 852028, 8, 917564, 8 )
+
+[node name="KinematicBody2D" parent="." instance=ExtResource( 2 )]
+
+transform/pos = Vector2( 434, 148 )
+
+[node name="Potion" parent="." instance=ExtResource( 3 )]
+
+transform/pos = Vector2( 272, 144 )
+
+[node name="EndLevel" parent="." instance=ExtResource( 4 )]
+
+transform/pos = Vector2( 1552, 400 )
+
+[node name="EndLevel1" parent="." instance=ExtResource( 4 )]
+
+transform/pos = Vector2( 1856, 656 )
 
 

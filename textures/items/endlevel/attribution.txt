@@ -1,0 +1,6 @@
+Source of endlevel.txt:
+Nekith
+opengameart.org/content/flags-0
+
+License:
+Public Domain CC0

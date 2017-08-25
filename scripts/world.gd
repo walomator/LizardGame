@@ -2,7 +2,7 @@ extends Node2D
 
 const path_to_maps = "res://scenes/maps/"
 const current_map_name = "map-test"
-const path_to_current_map = path_to_maps + current_map_name + ".scn/"
+const path_to_current_map = path_to_maps + current_map_name + ".tscn/"
 var current_map_scene = preload(path_to_current_map)
 var current_map
 
