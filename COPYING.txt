@@ -1,5 +1,5 @@
 
-The included code is released under GNU GPL Version 3 (see below), with the exception of the Godot Engine, which is redistributed under MIT.
+The included code is released under GNU GPL Version 3 (see below), with the exception of the Godot Engine, which is licensed under MIT, and any code that claims otherwise by an accompanied license.txt (however, only free software licenses are acceptable in this project). 
 
 All data files (textures/images, animations, sounds, music, scenes, etc.) are either licensed according to a 'license.txt' or, if not specified anywhere, licensed under Creative-Commons-BY 4.0.
 
