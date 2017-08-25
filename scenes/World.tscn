@@ -21,6 +21,7 @@ script/script = ExtResource( 1 )
 "Players",
 ] instance=ExtResource( 2 )]
 
+editor/display_folded = true
 transform/pos = Vector2( 65, 132 )
 
 [node name="Camera2D" type="Camera2D" parent="Protagonist"]
@@ -55,6 +56,7 @@ texture = ExtResource( 3 )
 "Enemies",
 ]]
 
+editor/display_folded = true
 transform/pos = Vector2( 206, 132 )
 input/pickable = false
 shapes/0/shape = SubResource( 1 )

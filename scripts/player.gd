@@ -246,4 +246,4 @@ func launch_particle(particle_type):
 		get_tree().get_root().add_child(particle)
 		particle.set_direction(self.get_last_direction())
 		particle.set_spawner("Protagonist")
-		particle.set_pos(get_pos()) # Not really centered
+		particle.set_pos(self.get_pos()) # Not really centered
