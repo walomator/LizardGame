@@ -1,4 +1,4 @@
-Source of endlevel.txt:
+Source of endlevel flag:
 Nekith
 opengameart.org/content/flags-0
 
