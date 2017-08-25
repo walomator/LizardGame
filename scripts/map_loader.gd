@@ -1,6 +1,6 @@
-# NOTE! THE BELOW MESSAGE WAS WRITTEN TO DESCRIBE AN IMPLEMENTATION BEFORE
-# IT WAS IMPLEMENTED! THE BELOW IS NOT TRUE YET AND IS THERE TO SERVE AS A
-# PROGRAMMER'S GUIDE
+# NOTE! THE SCRIPT IS AN UNFINISHED ATTEMPT TO CONVERT TILED TILEMAPS.
+# TOO MUCH HASSLE CAME OUT OF CONVERSION, IT WILL BE LEFT IF ANYONE WISHES
+# TO ATTEMPT, ALTHOUGH IT IS NOT RECOMMENDED ANOTHER MAP SOLUTION SHOULD ARISE.
 #
 # This script is designed to make importing maps from Tiled map editor easy and
 #   as a result, the successfully converted Tiled tilemaps (using vnen's
@@ -37,7 +37,7 @@ const potion_scene = preload("res://scenes/items/Potion.tscn/")
 const end_level_scene = preload("res://scenes/effects/EndLevel.tscn/")
 const slime_scene = preload("res://scenes/monsters/slime/Slime.tscn/")
 const goblin_scene = preload("res://scenes/monsters/goblin/Goblin.tscn/")
-#const test_scene = preload("res://scenes/Test.tscn")
+const test_scene = preload("res://scenes/Test.tscn")
 var target_node
 
 func _ready():
@@ -45,8 +45,8 @@ func _ready():
 	var objects = self.get_node("Objects")
 	for tiled_object in objects.get_children():
 #		print(tiled_object.get_name())
-		print("Found tiled_object:")
-		print(tiled_object)
+#		print("Found tiled_object:")
+#		print(tiled_object)
 		if "Potion" in tiled_object.get_name():
 			print("There is a potion to import.")
 			set_potion(tiled_object)
@@ -65,13 +65,6 @@ func _ready():
 			
 	# End for
 	
-#	var test_node = self.get_node("Objects").get_node("Potion")
-#	test_node.replace_by(test_node) 
-#	print("Replacing the first potion as a test.")
-	
-#	print("Children nodes:")
-#	print(self.get_children())
-#	breakpoint
 	save_scene("res://scenes/maps/TempSceneName.tscn")
 	
 
@@ -96,13 +89,10 @@ func set_monster(monster_name, tiled_object):
 
 func _replace_object(tiled_object, target_scene):
 	var object_pos = tiled_object.get_node("CollisionShape2D").get_global_pos()
-#	print("Position of old tiled_object node:")
-#	print(object_pos)
 	tiled_object.free()
-#	tiled_object.queue_free()
 	
 	target_node = target_scene.instance()
-#	target_node.set_owner(self)
+#	target_node.set_owner(get_tree().get_root())
 	self.add_child(target_node)
 	target_node.set_pos(object_pos)
 #	print("Position of new node:")
@@ -112,8 +102,11 @@ func _replace_object(tiled_object, target_scene):
 func save_scene(scene_save_path):
 #	print("Packing current scene.")
 	packed_scene = PackedScene.new()
+	print(self.get_tree().get_root().get_children())
 	packed_scene.pack(get_node("/root/World/map-test"))
 #	packed_scene.pack(self)
+	
+	print(packed_scene.can_instance())
 	
 	ResourceSaver.save(scene_save_path, packed_scene)
 	
