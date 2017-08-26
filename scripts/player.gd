@@ -57,6 +57,9 @@ var idle_sprite_node_name = "IdleSprite/"
 var move_anim_node_name = "RunAnim/"
 var fall_anim_node_name = "FallAnim/"
 
+var ActionHolder = preload("res://scripts/action_holder.gd")
+var action
+
 
 func _ready():
 	set_fixed_process(true)
@@ -65,10 +68,10 @@ func _ready():
 	move_anim_node =  get_node(path_to_protagonist_node + move_anim_node_name)
 	fall_anim_node =  get_node(path_to_protagonist_node + fall_anim_node_name)
 	scoreboard_node = get_node(path_to_scoreboard_node)
-	print(scoreboard_node)
 	self.connect("attacked_enemy", scoreboard_node, "handle_attacked_enemy", [])
 	self.connect("bumped_enemy", scoreboard_node, "handle_bumped_enemy", [])
-#	self.connect("bumped_end_level", scoreboard_node, "handle_passed_end_level", [])
+	
+	action = ActionHolder.new()
 
 
 func _fixed_process(delta):
@@ -123,10 +126,12 @@ func _input(event):
 	# Input
 	if event.is_action_pressed("ui_right"):
 		print("right")
+		action.add("right")
 		set_direction("right")
 		flip_sprite(false)
 	elif event.is_action_pressed("ui_left"):
 		print("left")
+		action.add("left")
 		set_direction("left")
 		flip_sprite(true)
 	elif (event.is_action_released("ui_right") and direction == 1) or (event.is_action_released("ui_left") and direction == -1):
@@ -180,10 +185,11 @@ func get_last_direction():
 func set_direction(player_direction = "update"):
 	# Should be a simpler setter that calls a handle_change_direction
 	if player_direction == "right":
-		direction = 1
+		direction += 1
+		print(direction)
 		is_moving = true
 	if player_direction == "left":
-		direction = -1
+		direction -= 1
 		is_moving = true
 	if player_direction == "still":
 		direction = 0
