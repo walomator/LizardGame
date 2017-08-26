@@ -57,7 +57,7 @@ var idle_sprite_node_name = "IdleSprite/"
 var move_anim_node_name = "RunAnim/"
 var fall_anim_node_name = "FallAnim/"
 
-#var ActionHolder = preload("res://scripts/action_holder.gd")
+var ActionHolder = preload("res://scripts/action_holder.gd")
 var action
 
 
@@ -71,8 +71,8 @@ func _ready():
 	self.connect("attacked_enemy", scoreboard_node, "handle_attacked_enemy", [])
 	self.connect("bumped_enemy", scoreboard_node, "handle_bumped_enemy", [])
 	
-#	action = ActionHolder.new()
-	action = []
+	action = ActionHolder.new()
+#	action = []
 
 
 func _fixed_process(delta):
@@ -126,27 +126,27 @@ func _input(event):
 	
 	# Input
 	# This - this is just shoddy craftsmanship
-	if event.is_action_pressed("ui_right"):
+	if event.is_action_pressed("move_right"):
 		print("right")
-		action.append("right")
-		set_direction()
+		action.add("right")
+		set_direction("right")
 		flip_sprite(false)
-	if event.is_action_pressed("ui_left"):
+	if event.is_action_pressed("move_left"):
 		print("left")
-		action.append("left")
-		set_direction()
+		action.add("left")
+		set_direction("left")
 		flip_sprite(true)
-	if event.is_action_released("ui_right"):
+	if event.is_action_released("move_right"):
 		action.remove("right")
 		set_direction()
-	if event.is_action_released("ui_left"):
+	if event.is_action_released("move_left"):
 		action.remove("left")
 		set_direction()
 #	if (event.is_action_released("ui_right") and direction == 1) or (event.is_action_released("ui_left") and direction == -1):
 #		print("stopped")
 #		set_direction("still")
 	
-	if event.is_action_pressed("ui_up") and jump_count < max_jump_count:
+	if event.is_action_pressed("ui_up"): #and jump_count < max_jump_count:
 		print("jump")
 		is_grounded = false
 		set_direction()
@@ -158,12 +158,15 @@ func _input(event):
 		speed_x = MAX_SPEED_X
 	
 	if event.is_action_pressed("reset"):
+		print("reset")
 		reset_position()
 	
 	if event.is_action_pressed("combat_action_1"):
+		print("fireball")
 		launch_particle("fireball")
 	
 	if event.is_action_pressed("debug"):
+		print("debug")
 		debug()
 	
 
@@ -195,16 +198,17 @@ func get_last_direction():
 
 func set_direction(player_direction = "update"):
 	# Should be a simpler setter that calls a handle_change_direction
-	if "right" in action:
+	direction = 0
+	if "right" in action.get_actions():
 		direction += 1
 #		is_moving = true
-	if "left" in action:
+	if "left" in action.get_actions():
 		direction -= 1
 #		is_moving = true
 	if direction == 0:
-		is_moving = true
-	else:
 		is_moving = false
+	else:
+		is_moving = true
 #	if player_direction == "right":
 #		direction += 1
 #		is_moving = true
@@ -274,3 +278,4 @@ func launch_particle(particle_type):
 
 func debug():
 	print(action.get_actions())
+	print("direction: " + str(direction))

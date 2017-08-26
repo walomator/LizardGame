@@ -23,6 +23,7 @@ func add(action):
 func remove(action):
 	if action in valid_actions:
 		active_actions.remove(action)
+	
 
 func get_actions():
 	return active_actions
