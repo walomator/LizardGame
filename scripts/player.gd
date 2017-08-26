@@ -69,7 +69,7 @@ var move_anim_node_name = "AnimatedSprite/"
 
 
 func _ready():
-	set_process(true)
+	set_fixed_process(true)
 	set_process_input(true)
 	idle_sprite_node = get_node(path_to_protagonist_node + idle_sprite_node_name)
 	move_anim_node =  get_node(path_to_protagonist_node + move_anim_node_name)
@@ -80,7 +80,7 @@ func _ready():
 #	self.connect("bumped_end_level", scoreboard_node, "handle_passed_end_level", [])
 
 
-func _process(delta):
+func _fixed_process(delta):
 	speed_y = clamp(speed_y, speed_y, MAX_SPEED_Y)
 	speed_y += GRAVITY * delta
 	
