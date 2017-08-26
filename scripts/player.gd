@@ -57,7 +57,7 @@ var idle_sprite_node_name = "IdleSprite/"
 var move_anim_node_name = "RunAnim/"
 var fall_anim_node_name = "FallAnim/"
 
-var ActionHolder = preload("res://scripts/action_holder.gd")
+#var ActionHolder = preload("res://scripts/action_holder.gd")
 var action
 
 
@@ -71,7 +71,8 @@ func _ready():
 	self.connect("attacked_enemy", scoreboard_node, "handle_attacked_enemy", [])
 	self.connect("bumped_enemy", scoreboard_node, "handle_bumped_enemy", [])
 	
-	action = ActionHolder.new()
+#	action = ActionHolder.new()
+	action = []
 
 
 func _fixed_process(delta):
@@ -124,19 +125,26 @@ func _input(event):
 		last_direction = direction
 	
 	# Input
+	# This - this is just shoddy craftsmanship
 	if event.is_action_pressed("ui_right"):
 		print("right")
-		action.add("right")
-		set_direction("right")
+		action.append("right")
+		set_direction()
 		flip_sprite(false)
-	elif event.is_action_pressed("ui_left"):
+	if event.is_action_pressed("ui_left"):
 		print("left")
-		action.add("left")
-		set_direction("left")
+		action.append("left")
+		set_direction()
 		flip_sprite(true)
-	elif (event.is_action_released("ui_right") and direction == 1) or (event.is_action_released("ui_left") and direction == -1):
-		print("stopped")
-		set_direction("still")
+	if event.is_action_released("ui_right"):
+		action.remove("right")
+		set_direction()
+	if event.is_action_released("ui_left"):
+		action.remove("left")
+		set_direction()
+#	if (event.is_action_released("ui_right") and direction == 1) or (event.is_action_released("ui_left") and direction == -1):
+#		print("stopped")
+#		set_direction("still")
 	
 	if event.is_action_pressed("ui_up") and jump_count < max_jump_count:
 		print("jump")
@@ -187,16 +195,25 @@ func get_last_direction():
 
 func set_direction(player_direction = "update"):
 	# Should be a simpler setter that calls a handle_change_direction
-	if player_direction == "right":
+	if "right" in action:
 		direction += 1
-		print(direction)
-		is_moving = true
-	if player_direction == "left":
+#		is_moving = true
+	if "left" in action:
 		direction -= 1
+#		is_moving = true
+	if direction == 0:
 		is_moving = true
-	if player_direction == "still":
-		direction = 0
+	else:
 		is_moving = false
+#	if player_direction == "right":
+#		direction += 1
+#		is_moving = true
+#	if player_direction == "left":
+#		direction -= 1
+#		is_moving = true
+#	if player_direction == "still":
+#		direction = 0
+#		is_moving = false
 	if is_grounded:
 		if is_moving:
 			switch_mode("moving")
