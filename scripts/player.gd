@@ -13,6 +13,7 @@ var fireball_scene = preload("res://scenes/effects/Fireball.tscn")
 
 var idle_sprite_node # Safe to initialize in the _ready() function
 var move_anim_node
+var fall_anim_node
 var scoreboard_node
 
 signal attacked_enemy
@@ -34,6 +35,7 @@ var colliding_body
 var is_moving = false # Running implies specifically FAST running, to be considered if there will be multiple speeds
 var movement_mode = "idle"
 var is_grounded
+var still_is_grounded
 
 # CLEANUP - A lot of these should not be constants
 const MAX_SPEED_X = 250 # Right now there is no acceleration, but I'd like to add a little bit back in
@@ -61,6 +63,7 @@ func _ready():
 	set_process_input(true)
 	idle_sprite_node = get_node(path_to_protagonist_node + idle_sprite_node_name)
 	move_anim_node =  get_node(path_to_protagonist_node + move_anim_node_name)
+	fall_anim_node =  get_node(path_to_protagonist_node + fall_anim_node_name)
 	scoreboard_node = get_node(path_to_scoreboard_node)
 	print(scoreboard_node)
 	self.connect("attacked_enemy", scoreboard_node, "handle_attacked_enemy", [])
@@ -80,6 +83,9 @@ func _fixed_process(delta):
 	
 	if is_colliding():
 		is_grounded = true
+		if is_grounded != still_is_grounded:
+			set_direction()
+		still_is_grounded = true
 		collide_normal = get_collision_normal()
 		colliding_body = get_collider()
 		
@@ -102,6 +108,9 @@ func _fixed_process(delta):
 		
 	else:
 		is_grounded = false
+		if is_grounded != still_is_grounded:
+			set_direction()
+		still_is_grounded = false
 		if jump_count == 0: # If player fell off a ledge
 			jump_count = 1
 	# End if is_colliding()
@@ -115,17 +124,19 @@ func _input(event):
 	if event.is_action_pressed("ui_right"):
 		print("right")
 		set_direction("right")
-		flip_sprite(false, is_moving)
+		flip_sprite(false)
 	elif event.is_action_pressed("ui_left"):
 		print("left")
 		set_direction("left")
-		flip_sprite(true, is_moving)
+		flip_sprite(true)
 	elif (event.is_action_released("ui_right") and direction == 1) or (event.is_action_released("ui_left") and direction == -1):
 		print("stopped")
 		set_direction("still")
 	
 	if event.is_action_pressed("ui_up") and jump_count < max_jump_count:
 		print("jump")
+		is_grounded = false
+		set_direction()
 		speed_y = -JUMP_FORCE
 		jump_count += 1
 		# FEAT - Variable jump length should be a feature later
@@ -140,9 +151,10 @@ func _input(event):
 		launch_particle("fireball")
 	
 
-func flip_sprite(is_flipped, player_is_moving):
-	move_anim_node.set_flip_h(is_flipped)
+func flip_sprite(is_flipped):
 	idle_sprite_node.set_flip_h(is_flipped)
+	move_anim_node.set_flip_h(is_flipped)
+	fall_anim_node.set_flip_h(is_flipped)
 	
 
 func get_direction():
@@ -165,7 +177,7 @@ func get_last_direction():
 	return player_direction
 	
 
-func set_direction(player_direction):
+func set_direction(player_direction = "update"):
 	# Should be a simpler setter that calls a handle_change_direction
 	if player_direction == "right":
 		direction = 1
@@ -186,18 +198,24 @@ func set_direction(player_direction):
 		switch_mode("air")
 	
 func switch_mode(character_mode):
-	if character_mode == "moving":
-		move_anim_node.play()
-		move_anim_node.set_hidden(false)
-		idle_sprite_node.set_hidden(true)
-	elif character_mode == "air": # Currently the same as "moving"
-		move_anim_node.play()
-		move_anim_node.set_hidden(false)
-		idle_sprite_node.set_hidden(true)
-	elif character_mode == "still":
+	if character_mode == "still":
 		move_anim_node.stop()
+		fall_anim_node.stop()
 		idle_sprite_node.set_hidden(false)
 		move_anim_node.set_hidden(true)
+		fall_anim_node.set_hidden(true)
+	elif character_mode == "moving":
+		move_anim_node.play()
+		fall_anim_node.stop()
+		idle_sprite_node.set_hidden(true)
+		move_anim_node.set_hidden(false)
+		fall_anim_node.set_hidden(true)
+	elif character_mode == "air": # Currently the same as "moving"
+		move_anim_node.stop()
+		fall_anim_node.play()
+		idle_sprite_node.set_hidden(true)
+		move_anim_node.set_hidden(true)
+		fall_anim_node.set_hidden(false)
 
 
 func reset_position():
@@ -209,6 +227,7 @@ func reset_position():
 func handle_enemy_collision():
 	if collide_normal == Vector2(0, -1): # Landed from above
 		emit_signal("attacked_enemy")
+		is_grounded = false
 		speed_y = -BOUNCE_FORCE # Fixed bounciness, no matter the fall distance
 		jump_count = 1
 	else:

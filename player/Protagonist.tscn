@@ -1,26 +1,14 @@
-[gd_scene load_steps=10 format=1]
+[gd_scene load_steps=6 format=1]
 
 [ext_resource path="res://scripts/player.gd" type="Script" id=1]
 [ext_resource path="res://textures/protagonist/protagonist.png" type="Texture" id=2]
 [ext_resource path="res://player/RunAnim.tres" type="SpriteFrames" id=3]
-[ext_resource path="res://textures/protagonist/fall/1.png" type="Texture" id=4]
-[ext_resource path="res://textures/protagonist/fall/2.png" type="Texture" id=5]
-[ext_resource path="res://textures/protagonist/fall/3.png" type="Texture" id=6]
-[ext_resource path="res://textures/protagonist/fall/4.png" type="Texture" id=7]
+[ext_resource path="res://player/FallAnim.tres" type="SpriteFrames" id=4]
 
 [sub_resource type="RectangleShape2D" id=1]
 
 custom_solver_bias = 0.0
 extents = Vector2( 9, 16 )
-
-[sub_resource type="SpriteFrames" id=2]
-
-animations = [ {
-"frames": [ ExtResource( 4 ), ExtResource( 5 ), ExtResource( 6 ), ExtResource( 7 ) ],
-"loop": true,
-"name": "default",
-"speed": 5.0
-} ]
 
 [node name="Protagonist" type="KinematicBody2D" groups=[
 "Players",
@@ -63,7 +51,7 @@ animation = "default"
 
 visibility/visible = false
 transform/pos = Vector2( 0, 12 )
-frames = SubResource( 2 )
+frames = ExtResource( 4 )
 animation = "default"
 
 
