@@ -1,17 +1,4 @@
 # Buglist
-# The Bugaroo Bug
-#	Replicable: sometimes
-#	Character becomes extra shaky when running against a slime.
-#	Sometimes a vertical shakiness, sometimes a horizontal shakiness.
-#	Matthew: glitched up on top of the slime from doing this from laptop.
-#	Matthew: horizontal shakiness experienced on desktop, vertical shakiness on laptop
-# The Didgeridoo Bug
-#	Replicable: no (not reliably)
-#	Character becomes shaky when standing still on the ground.
-#	Usually does not occur, but then sometimes, for no reason, it does occur.
-#	May be related to screen resolution.
-#	Matthew: Luke may experience it the most often.
-#	Matthew: has experienced it on desktop and laptop.
 # Running Man Bug
 #	Replicable: yes
 #	Sprites for protagonist's running animation don't align with idle
@@ -65,7 +52,8 @@ var path_to_scoreboard_node = "/root/World/Scoreboard/"
 # Not sure if there is a reason to make the paths to nodes a variable if they are only used once
 
 var idle_sprite_node_name = "IdleSprite/"
-var move_anim_node_name = "AnimatedSprite/"
+var move_anim_node_name = "RunAnim/"
+var fall_anim_node_name = "FallAnim/"
 
 
 func _ready():
