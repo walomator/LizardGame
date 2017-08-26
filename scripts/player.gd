@@ -155,6 +155,9 @@ func _input(event):
 	if event.is_action_pressed("combat_action_1"):
 		launch_particle("fireball")
 	
+	if event.is_action_pressed("debug"):
+		debug()
+	
 
 func flip_sprite(is_flipped):
 	idle_sprite_node.set_flip_h(is_flipped)
@@ -243,16 +246,6 @@ func handle_enemy_collision():
 		# I am calling it the Bugaroo Bug for no apparent reason. See above.
 	
 
-#func handle_flag_collision(flag_object):
-#	if flag_object.is_in_group("EndLevel"):
-#		emit_signal("bumped_end_level")
-#	
-
-#func handle_item_collision(item_object):
-#	if item_object.is_in_group("Potions"):
-#		print("No more room for potions!")
-#	
-
 func launch_particle(particle_type):
 	if particle_type == "fireball":
 		var particle = fireball_scene.instance()
@@ -260,3 +253,7 @@ func launch_particle(particle_type):
 		particle.set_direction(self.get_last_direction())
 		particle.set_spawner("Protagonist")
 		particle.set_pos(self.get_pos()) # Not really centered
+		
+
+func debug():
+	print(action.get_actions())
