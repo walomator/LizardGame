@@ -137,16 +137,18 @@ func _input(event):
 		set_direction("left")
 		flip_sprite(true)
 	if event.is_action_released("move_right"):
+		print("right released")
 		action.remove("right")
 		set_direction()
 	if event.is_action_released("move_left"):
+		print("left released")
 		action.remove("left")
 		set_direction()
 #	if (event.is_action_released("ui_right") and direction == 1) or (event.is_action_released("ui_left") and direction == -1):
 #		print("stopped")
 #		set_direction("still")
 	
-	if event.is_action_pressed("ui_up"): #and jump_count < max_jump_count:
+	if event.is_action_pressed("move_up"): #and jump_count < max_jump_count:
 		print("jump")
 		is_grounded = false
 		set_direction()
@@ -166,7 +168,6 @@ func _input(event):
 		launch_particle("fireball")
 	
 	if event.is_action_pressed("debug"):
-		print("debug")
 		debug()
 	
 
@@ -277,5 +278,7 @@ func launch_particle(particle_type):
 		
 
 func debug():
-	print(action.get_actions())
-	print("direction: " + str(direction))
+	print("...")
+	print("...")
+#	print(action.get_actions())
+#	print("direction: " + str(direction))
