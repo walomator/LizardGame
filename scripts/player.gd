@@ -130,12 +130,12 @@ func _input(event):
 		print("right")
 		action.add("right")
 		set_direction("right")
-		flip_sprite(false)
+#		flip_sprite(false)
 	if event.is_action_pressed("move_left"):
 		print("left")
 		action.add("left")
 		set_direction("left")
-		flip_sprite(true)
+#		flip_sprite(true)
 	if event.is_action_released("move_right"):
 		print("right released")
 		action.remove("right")
@@ -148,7 +148,7 @@ func _input(event):
 #		print("stopped")
 #		set_direction("still")
 	
-	if event.is_action_pressed("move_up"): #and jump_count < max_jump_count:
+	if event.is_action_pressed("move_up") and jump_count < max_jump_count:
 		print("jump")
 		is_grounded = false
 		set_direction()
@@ -227,6 +227,10 @@ func set_direction(player_direction = "update"):
 	else:
 		# Should be an animated sprite
 		switch_mode("air")
+	if direction > 0:
+		flip_sprite(false)
+	if direction < 0:
+		flip_sprite(true)
 	
 func switch_mode(character_mode):
 	if character_mode == "still":
