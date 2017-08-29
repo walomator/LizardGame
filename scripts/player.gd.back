@@ -25,8 +25,8 @@ var last_direction = 1 # The direction last moved, or the facing direction
 var start_pos_x = 128
 var start_pos_y = 128
 var move_remainder = Vector2(0, 0)
-var force_x = 0
-var force_y = 0
+var speed_x = 0
+var speed_y = 0
 var velocity = Vector2(0, 0)
 var collide_normal
 
@@ -35,16 +35,16 @@ var colliding_body
 var is_moving = false # Running implies specifically FAST running, to be considered if there will be multiple speeds
 var movement_mode = "idle"
 var is_grounded
-var was_grounded
+var still_is_grounded
 
 # CLEANUP - A lot of these should not be constants
-const MAX_SPEED_X = 5 # Right now there is no acceleration, but I'd like to add a little bit back in
-const MAX_SPEED_Y = 1 # BUG - limits falling speed, not jump speed
+const MAX_SPEED_X = 250 # Right now there is no acceleration, but I'd like to add a little bit back in
+const MAX_SPEED_Y = 300 # BUG - limits falling speed, not jump speed
 # FEAT - There should exist a max fall speed and a max "launch" speed
 
-const JUMP_FORCE = 20
-const BOUNCE_FORCE = 3 # Should change this to be dependant on the enemy
-const GRAVITY = 7 # Opposes jump force
+const JUMP_FORCE = 420
+const BOUNCE_FORCE = 300 # Should change this to be dependant on the enemy
+const GRAVITY = 750 # Opposes jump force
 
 var jump_count = 0
 var max_jump_count = 2 # Should be 1, but I'm testing double jump
@@ -76,35 +76,20 @@ func _ready():
 
 
 func _fixed_process(delta):
+	speed_y = clamp(speed_y, speed_y, MAX_SPEED_Y)
+	speed_y += GRAVITY * delta
 	
-	# Update velocity (should be based on speed_x/y, or speed_x/y should be replaced with velocity)
+	velocity.x = speed_x * delta * direction
+	velocity.y = speed_y * delta # BUG - this does not work perfectly with gravitational acceleration.
 	
-	velocity.x = MAX_SPEED_X * direction
-#	velocity.x += force_x * delta
-#	clamp(velocity.x, velocity.x, MAX_SPEED_X)
-	
-	velocity.y += GRAVITY * delta
-	velocity.y += force_y * delta
-	clamp(velocity.y, velocity.y, MAX_SPEED_Y)
-	if force_y != 0:
-		print(velocity.y)
-		breakpoint
-	
-	force_x = 0
-	force_y = 0
-	
-	##########################################3
-
 	# Movement
-	
-	# Try to move initially
-	move_remainder = move(velocity) # move(velocity) returns the remainder of movement after collision
+	move_remainder = move(velocity)
 	
 	if is_colliding():
 		is_grounded = true
-		if is_grounded != was_grounded:
+		if is_grounded != still_is_grounded:
 			set_direction()
-		was_grounded = true
+		still_is_grounded = true
 		collide_normal = get_collision_normal()
 		colliding_body = get_collider()
 		
@@ -120,17 +105,16 @@ func _fixed_process(delta):
 			else:
 				is_grounded = false
 			
-			velocity.y = collide_normal.slide(Vector2(0, velocity.y)).y
-			# This should be rewritten in cleaner code
+			speed_y = collide_normal.slide(Vector2(0, speed_y)).y
 			# This keeps falling speed from accumulating where it shouldn't (eg. on the ground).
 			# Possible BUG - it may mean that walking up slopes makes the character move slower, which isn't desired.
 			# It may also mean that you cannot run up slopes, not sure
 		
 	else:
 		is_grounded = false
-		if is_grounded != was_grounded:
+		if is_grounded != still_is_grounded:
 			set_direction()
-		was_grounded = false
+		still_is_grounded = false
 		if jump_count == 0: # If player fell off a ledge
 			jump_count = 1
 	# End if is_colliding()
@@ -168,12 +152,12 @@ func _input(event):
 		print("jump")
 		is_grounded = false
 		set_direction()
-		force_y = -JUMP_FORCE
+		speed_y = -JUMP_FORCE
 		jump_count += 1
 		# FEAT - Variable jump length should be a feature later
 	
-#	if direction:
-#		force_x = MAX_SPEED_X
+	if direction:
+		speed_x = MAX_SPEED_X
 	
 	if event.is_action_pressed("reset"):
 		print("reset")
@@ -271,18 +255,21 @@ func switch_mode(character_mode):
 
 func reset_position():
 	self.set_pos(Vector2(start_pos_x, start_pos_y))
-	velocity = Vector2(0, 0)
+	speed_x = 0
+	speed_y = 0
 	
 
 func handle_enemy_collision():
 	if collide_normal == Vector2(0, -1): # Landed from above
 		emit_signal("attacked_enemy")
 		is_grounded = false
-		force_y = -BOUNCE_FORCE # Fixed bounciness, no matter the fall distance
+		speed_y = -BOUNCE_FORCE # Fixed bounciness, no matter the fall distance
 		jump_count = 1
 	else:
 		emit_signal("bumped_enemy")
-		velocity.y = collide_normal.slide(Vector2(0, velocity.y)).y
+		speed_y = collide_normal.slide(Vector2(0, speed_y)).y
+		# This line may be the cause of a BUG.
+		# I am calling it the Bugaroo Bug for no apparent reason. See above.
 	
 
 func launch_particle(particle_type):
@@ -295,4 +282,7 @@ func launch_particle(particle_type):
 		
 
 func debug():
-	move(Vector2(200, 0))
+	print("...")
+	print("...")
+#	print(action.get_actions())
+#	print("direction: " + str(direction))
