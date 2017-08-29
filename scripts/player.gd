@@ -42,7 +42,7 @@ const MAX_SPEED_X = 5 # Right now there is no acceleration, but I'd like to add 
 const MAX_SPEED_Y = 1 # BUG - limits falling speed, not jump speed
 # FEAT - There should exist a max fall speed and a max "launch" speed
 
-const JUMP_FORCE = 20
+const JUMP_FORCE = 4
 const BOUNCE_FORCE = 3 # Should change this to be dependant on the enemy
 const GRAVITY = 7 # Opposes jump force
 
@@ -80,15 +80,18 @@ func _fixed_process(delta):
 	# Update velocity (should be based on speed_x/y, or speed_x/y should be replaced with velocity)
 	
 	velocity.x = MAX_SPEED_X * direction
-#	velocity.x += force_x * delta
-#	clamp(velocity.x, velocity.x, MAX_SPEED_X)
+	velocity.x += force_x
+	clamp(velocity.x, velocity.x, MAX_SPEED_X)
+	# Problem: this limits an absolute velocity with no respect to how often
+	# the node is being moved at velocity
 	
-	velocity.y += GRAVITY * delta
-	velocity.y += force_y * delta
+	velocity.y += GRAVITY * delta + force_y # v(t) = G*t + C
 	clamp(velocity.y, velocity.y, MAX_SPEED_Y)
+	# Problem: this limits an absolute velocity with no respect to how often
+	# the node is being moved at velocity
 	if force_y != 0:
 		print(velocity.y)
-		breakpoint
+#		breakpoint
 	
 	force_x = 0
 	force_y = 0
@@ -295,4 +298,6 @@ func launch_particle(particle_type):
 		
 
 func debug():
-	move(Vector2(200, 0))
+#	move(Vector2(200, 0))
+	print(velocity.y)
+	
