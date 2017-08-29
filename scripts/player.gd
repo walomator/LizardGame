@@ -33,30 +33,23 @@ var force_x = 0
 var force_y = 0
 var velocity = Vector2(0, 0)
 var collide_normal
-
 var colliding_body
-
 var is_moving = false # Running implies specifically FAST running, to be considered if there will be multiple speeds
 var movement_mode = "idle"
 var is_grounded
 var was_grounded
 
-# CLEANUP - A lot of these should not be constants
-const MAX_SPEED_X = 5 # Right now there is no acceleration, but I'd like to add a little bit back in
-const MAX_SPEED_Y = 1 # BUG - limits falling speed, not jump speed
-# Consider that there should be a max speed for a velocity vector in any direction.
-# Consider adding a "feather-fall" feature that makes specifically falling from gravity slower
-
-const JUMP_FORCE = 4
-const BOUNCE_FORCE = 3 # Should change this to be dependant on the enemy
-const GRAVITY = 7 # Opposes jump force
+const RUN_SPEED    = 4
+const MAX_VELOCITY = 11
+const JUMP_FORCE   = 5
+const BOUNCE_FORCE = 3 # Likely to be enemy specific in the future
+const GRAVITY      = 8 # Opposes jump force
 
 var jump_count = 0
-var max_jump_count = 2 # Should be 1, but I'm testing double jump
+var max_jump_count = 2
 
 var path_to_protagonist_node = "/root/World/Protagonist/"
 var path_to_scoreboard_node = "/root/World/Scoreboard/"
-# Not sure if there is a reason to make the paths to nodes a variable if they are only used once
 
 var idle_sprite_node_name = "IdleSprite/"
 var move_anim_node_name = "RunAnim/"
@@ -64,7 +57,6 @@ var fall_anim_node_name = "FallAnim/"
 
 var ActionHolder = preload("res://scripts/action_holder.gd")
 var action
-
 
 func _ready():
 	set_fixed_process(true)
@@ -77,33 +69,19 @@ func _ready():
 	self.connect("bumped_enemy", scoreboard_node, "handle_bumped_enemy", [])
 	
 	action = ActionHolder.new()
-#	action = []
-
+	
 
 func _fixed_process(delta):
-	
-	# Update velocity (should be based on speed_x/y, or speed_x/y should be replaced with velocity)
-	
-	velocity.x = MAX_SPEED_X * direction
-	velocity.x += force_x
-	clamp(velocity.x, velocity.x, MAX_SPEED_X)
-	# Problem: this limits an absolute velocity with no respect to how often
-	# the node is being moved at velocity
-	
+	# Increase velocity due to gravity and other forces
+	velocity.x = RUN_SPEED * direction + force_x # Missing delta
 	velocity.y += GRAVITY * delta + force_y # v(t) = G*t + C
-	clamp(velocity.y, velocity.y, MAX_SPEED_Y)
-	# Problem: this limits an absolute velocity with no respect to how often
-	# the node is being moved at velocity
-	if force_y != 0:
-		print(velocity.y)
-#		breakpoint
 	
+	# Clear forces after being applied to velocity
 	force_x = 0
 	force_y = 0
 	
-	##########################################3
-
-	# Movement
+	# Maximize speed a character can be moved by forces
+	velocity = velocity.normalized() * min(velocity.length(), MAX_VELOCITY)
 	
 	# Try to move initially
 	move_remainder = move(velocity) # move(velocity) returns the remainder of movement after collision
@@ -119,20 +97,18 @@ func _fixed_process(delta):
 		velocity = collide_normal.slide(move_remainder)
 		move(velocity)
 		
-		if colliding_body.is_in_group("Enemies"): # Should be done with signalling instead
+		# Should be done with signalling instead
+		if colliding_body.is_in_group("Enemies"):
 			handle_enemy_collision()
 		else:
-			# This should be in a function run conditionally if the colliding object doesn't do something else like bounce the player
-			if collide_normal == Vector2(0, -1): # Can't land on a sloped surface to refill jump_count
+			# This should be rewritten in cleaner code
+			velocity.y = collide_normal.slide(Vector2(0, velocity.y)).y
+			
+			if collide_normal == Vector2(0, -1): # Can't refill jump_count on slopes
 				jump_count = 0
 			else:
 				is_grounded = false
-			
-			velocity.y = collide_normal.slide(Vector2(0, velocity.y)).y
-			# This should be rewritten in cleaner code
-			# This keeps falling speed from accumulating where it shouldn't (eg. on the ground).
-			# Possible BUG - it may mean that walking up slopes makes the character move slower, which isn't desired.
-			# It may also mean that you cannot run up slopes, not sure
+		# End if colliding_body.is_in_group("Enemies"):else
 		
 	else:
 		is_grounded = false
@@ -141,25 +117,22 @@ func _fixed_process(delta):
 		was_grounded = false
 		if jump_count == 0: # If player fell off a ledge
 			jump_count = 1
-	# End if is_colliding()
-
+	# End if is_colliding():else
+	
 
 func _input(event):
 	if direction:
 		last_direction = direction
 	
 	# Input
-	# This - this is just shoddy craftsmanship
 	if event.is_action_pressed("move_right"):
-		print("right")
+#		print("right")
 		action.add("right")
 		set_direction("right")
-#		flip_sprite(false)
 	if event.is_action_pressed("move_left"):
-		print("left")
+#		print("left")
 		action.add("left")
 		set_direction("left")
-#		flip_sprite(true)
 	if event.is_action_released("move_right"):
 		print("right released")
 		action.remove("right")
@@ -168,27 +141,22 @@ func _input(event):
 		print("left released")
 		action.remove("left")
 		set_direction()
-#	if (event.is_action_released("ui_right") and direction == 1) or (event.is_action_released("ui_left") and direction == -1):
-#		print("stopped")
-#		set_direction("still")
 	
 	if event.is_action_pressed("move_up") and jump_count < max_jump_count:
 		print("jump")
 		is_grounded = false
 		set_direction()
+		velocity = Vector2(0, 0)
 		force_y = -JUMP_FORCE
 		jump_count += 1
-		# FEAT - Variable jump length should be a feature later
-	
-#	if direction:
-#		force_x = MAX_SPEED_X
+		# FEAT - Variable jump length needed
 	
 	if event.is_action_pressed("reset"):
-		print("reset")
+#		print("reset")
 		reset_position()
 	
 	if event.is_action_pressed("combat_action_1"):
-		print("fireball")
+#		print("fireball")
 		launch_particle("fireball")
 	
 	if event.is_action_pressed("debug"):
@@ -222,40 +190,31 @@ func get_last_direction():
 	
 
 func set_direction(player_direction = "update"):
-	# Should be a simpler setter that calls a handle_change_direction
 	direction = 0
 	if "right" in action.get_actions():
 		direction += 1
-#		is_moving = true
 	if "left" in action.get_actions():
 		direction -= 1
-#		is_moving = true
+	
 	if direction == 0:
 		is_moving = false
 	else:
 		is_moving = true
-#	if player_direction == "right":
-#		direction += 1
-#		is_moving = true
-#	if player_direction == "left":
-#		direction -= 1
-#		is_moving = true
-#	if player_direction == "still":
-#		direction = 0
-#		is_moving = false
+	
 	if is_grounded:
 		if is_moving:
 			switch_mode("moving")
 		else:
 			switch_mode("still")
 	else:
-		# Should be an animated sprite
 		switch_mode("air")
+	
 	if direction > 0:
 		flip_sprite(false)
 	if direction < 0:
 		flip_sprite(true)
 	
+
 func switch_mode(character_mode):
 	if character_mode == "still":
 		move_anim_node.stop()
@@ -275,7 +234,7 @@ func switch_mode(character_mode):
 		idle_sprite_node.set_hidden(true)
 		move_anim_node.set_hidden(true)
 		fall_anim_node.set_hidden(false)
-
+	
 
 func reset_position():
 	self.set_pos(Vector2(start_pos_x, start_pos_y))
@@ -286,6 +245,7 @@ func handle_enemy_collision():
 	if collide_normal == Vector2(0, -1): # Landed from above
 		emit_signal("attacked_enemy")
 		is_grounded = false
+		velocity = Vector2(0, 0)
 		force_y = -BOUNCE_FORCE # Fixed bounciness, no matter the fall distance
 		jump_count = 1
 	else:
@@ -299,10 +259,9 @@ func launch_particle(particle_type):
 		get_tree().get_root().add_child(particle)
 		particle.set_direction(self.get_last_direction())
 		particle.set_spawner("Protagonist")
-		particle.set_pos(self.get_pos()) # Not really centered
+		particle.set_pos(self.get_pos()) # BUG - Not centered
 		
 
 func debug():
-#	move(Vector2(200, 0))
-	print(velocity.y)
+	print(velocity)
 	
