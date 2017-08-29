@@ -4,6 +4,10 @@
 #	Sprites for protagonist's running animation don't align with idle
 #	Fix: edit animation frames
 
+# Bad Jumpman
+#	Replicable: yes
+#	Double jumping does not reset the climbing downward velocity force of gravity
+
 
 extends KinematicBody2D
 
@@ -40,7 +44,8 @@ var was_grounded
 # CLEANUP - A lot of these should not be constants
 const MAX_SPEED_X = 5 # Right now there is no acceleration, but I'd like to add a little bit back in
 const MAX_SPEED_Y = 1 # BUG - limits falling speed, not jump speed
-# FEAT - There should exist a max fall speed and a max "launch" speed
+# Consider that there should be a max speed for a velocity vector in any direction.
+# Consider adding a "feather-fall" feature that makes specifically falling from gravity slower
 
 const JUMP_FORCE = 4
 const BOUNCE_FORCE = 3 # Should change this to be dependant on the enemy
