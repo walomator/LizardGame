@@ -4,9 +4,9 @@
 #	Sprites for protagonist's running animation don't align with idle
 #	Fix: edit animation frames
 
-# Bad Jumpman
-#	Replicable: yes
-#	Double jumping does not reset the climbing downward velocity force of gravity
+# Sticky Walls
+#	Replicable: y
+#	Pressing against walls while falling slows a player
 
 
 extends KinematicBody2D
