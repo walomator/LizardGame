@@ -1,7 +1,7 @@
 
 The included code is released under GNU GPL Version 3 (see below), with the exception of the Godot Engine, which is licensed under MIT, and any code that claims otherwise by an accompanied license.txt (however, only free software licenses are acceptable in this project). 
 
-All data files (textures/images, animations, sounds, music, scenes, etc.) are either licensed according to a 'license.txt' or, if not specified anywhere, licensed under Creative-Commons-BY 4.0.
+All data files (textures/images, animations, sounds, music, scenes, etc.) are either licensed according to a 'license.txt' or, if not specified anywhere, licensed under CC0.
 
 Data files also include scene files (extension .tscn or .scn), tilemaps (extension .tmx or .tsx), and resources (extension .tres or .res), but not scripts (extension .gd), which are licensed as code.
 

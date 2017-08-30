@@ -1,6 +1,3 @@
-Source of endlevel flag:
-Nekith
-opengameart.org/content/flags-0
-
-License:
-Public Domain CC0
+Refers to: endlevel flags
+License: CC0
+By: Nekith (opengameart.org/content/flags-0)
