@@ -1,6 +1,6 @@
 # Buglist
 # Running Man Bug
-#	Replicable: yes
+#	Replicable: y
 #	Sprites for protagonist's running animation don't align with idle
 #	Fix: edit animation frames
 
@@ -12,7 +12,7 @@
 
 extends KinematicBody2D
 
-var debug = 1
+var debug = false
 
 var fireball_scene = preload("res://scenes/effects/Fireball.tscn")
 
@@ -71,7 +71,6 @@ func _ready():
 	scoreboard_node = get_node(path_to_scoreboard_node)
 	self.connect("attacked_enemy", scoreboard_node, "handle_attacked_enemy", [])
 	self.connect("bumped_enemy", scoreboard_node, "handle_bumped_enemy", [])
-	self
 	
 	action = ActionHolder.new()
 	
@@ -116,14 +115,16 @@ func _fixed_process(delta):
 		# End if colliding_body.is_in_group("Enemies"):else
 		
 	else:
-		print("----------")
-		print("Not colliding.")
-		print("Remainder: " + str(move_remainder))
-		is_grounded = false
-		print("is_grounded: " + str(is_grounded))
-		print("was_grounded: " + str(was_grounded))
+		if debug == true:
+			print("----------")
+			print("Not colliding.")
+			print("Remainder: " + str(move_remainder))
+			is_grounded = false
+			print("is_grounded: " + str(is_grounded))
+			print("was_grounded: " + str(was_grounded))
 		if is_grounded != was_grounded:
-			print("Setting direction")
+			if debug == true:
+				print("Setting direction")
 			set_direction()
 		was_grounded = false
 		if jump_count == 0: # If player fell off a ledge
@@ -228,26 +229,25 @@ func set_direction(player_direction = "update"):
 
 func switch_mode(character_mode):
 	if character_mode == "still":
-		print("character_mode: still")
 		move_anim_node.stop()
 		fall_anim_node.stop()
 		idle_sprite_node.set_hidden(false)
 		move_anim_node.set_hidden(true)
 		fall_anim_node.set_hidden(true)
 	elif character_mode == "moving":
-		print("character_mode: moving")
 		move_anim_node.play()
 		fall_anim_node.stop()
 		idle_sprite_node.set_hidden(true)
 		move_anim_node.set_hidden(false)
 		fall_anim_node.set_hidden(true)
 	elif character_mode == "air":
-		print("character_mode: air")
 		move_anim_node.stop()
 		fall_anim_node.play()
 		idle_sprite_node.set_hidden(true)
 		move_anim_node.set_hidden(true)
 		fall_anim_node.set_hidden(false)
+	if debug == true:
+		print("character_mode: " + str(character_mode))
 	
 
 func reset_position():
