@@ -67,6 +67,7 @@ func _ready():
 	scoreboard_node = get_node(path_to_scoreboard_node)
 	self.connect("attacked_enemy", scoreboard_node, "handle_attacked_enemy", [])
 	self.connect("bumped_enemy", scoreboard_node, "handle_bumped_enemy", [])
+	self
 	
 	action = ActionHolder.new()
 	
