@@ -11,18 +11,18 @@ var timers
 # Times overlap - ie fireball despawns 4 seconds after creation
 const TIME_TO_START_FLICKER = 2.5
 const FLICKER_INTERVAL = 0.05
-const TIME_TO_DIE = 4
+const TIME_TO_DIE = 3
 
 onready var sprite_node = self.get_node("Sprite")
 
 
 func _ready():
-	set_process(true)
+	set_fixed_process(true)
 	start_timer("TIME_TO_START_FLICKER", TIME_TO_START_FLICKER)
 	start_timer("TIME_TO_DIE", TIME_TO_DIE)
 	
 
-func _process(delta):
+func _fixed_process(delta):
 	if direction:
 		move(Vector2(direction * start_velocity * delta, 0))
 	
