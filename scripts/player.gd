@@ -4,9 +4,10 @@
 #	Sprites for protagonist's running animation don't align with idle
 #	Fix: edit animation frames
 
-# Sticky Walls
+# Sticky Walls and Floors
 #	Replicable: y
 #	Pressing against walls while falling slows a player
+#	Running is slower than jumping
 
 
 extends KinematicBody2D
@@ -36,17 +37,17 @@ var collide_normal
 var colliding_body
 var is_moving = false # Running implies specifically FAST running, to be considered if there will be multiple speeds
 var movement_mode = "idle"
-var is_grounded
-var was_grounded
+var is_grounded = true
+var was_grounded = true
 
-#const RUN_SPEED    = 400
-const RUN_SPEED    = 220
+#const RUN_SPEED    = 220
+const RUN_SPEED    = 1000
 const MAX_VELOCITY = 1100
-#const JUMP_FORCE   = 500
-const JUMP_FORCE   = 220
+#const JUMP_FORCE   = 220
+const JUMP_FORCE   = 1000
 const BOUNCE_FORCE = 100 # Likely to be enemy specific in the future
-#const GRAVITY      = 800 # Opposes jump force
-const GRAVITY      = 400 # Opposes jump force
+#const GRAVITY      = 400 # Opposes jump force
+const GRAVITY      = 1000
 
 var jump_count = 0
 var max_jump_count = 2
@@ -115,8 +116,14 @@ func _fixed_process(delta):
 		# End if colliding_body.is_in_group("Enemies"):else
 		
 	else:
+		print("----------")
+		print("Not colliding.")
+		print("Remainder: " + str(move_remainder))
 		is_grounded = false
+		print("is_grounded: " + str(is_grounded))
+		print("was_grounded: " + str(was_grounded))
 		if is_grounded != was_grounded:
+			print("Setting direction")
 			set_direction()
 		was_grounded = false
 		if jump_count == 0: # If player fell off a ledge
@@ -221,18 +228,21 @@ func set_direction(player_direction = "update"):
 
 func switch_mode(character_mode):
 	if character_mode == "still":
+		print("character_mode: still")
 		move_anim_node.stop()
 		fall_anim_node.stop()
 		idle_sprite_node.set_hidden(false)
 		move_anim_node.set_hidden(true)
 		fall_anim_node.set_hidden(true)
 	elif character_mode == "moving":
+		print("character_mode: moving")
 		move_anim_node.play()
 		fall_anim_node.stop()
 		idle_sprite_node.set_hidden(true)
 		move_anim_node.set_hidden(false)
 		fall_anim_node.set_hidden(true)
-	elif character_mode == "air": # Currently the same as "moving"
+	elif character_mode == "air":
+		print("character_mode: air")
 		move_anim_node.stop()
 		fall_anim_node.play()
 		idle_sprite_node.set_hidden(true)
