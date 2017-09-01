@@ -8,8 +8,9 @@ var direction = 0
 #var lifespan = 0
 var timers
 
+# Times overlap - ie fireball despawns 4 seconds after creation
 const TIME_TO_START_FLICKER = 2.5
-const FLICKER_INTERVAL = 0.1
+const FLICKER_INTERVAL = 0.05
 const TIME_TO_DIE = 4
 
 onready var sprite_node = self.get_node("Sprite")
@@ -49,7 +50,6 @@ func start_timer(name, time):
 	timer.start()
 
 func flicker_switch():
-	print("flicker")
 #	sprite_node.set_hidden(true)
 	sprite_node.set_hidden(not sprite_node.is_hidden())
 	
@@ -57,7 +57,6 @@ func flicker_switch():
 func die():
 	for child in self.get_children():
 		child.queue_free()
-	print("Kablamo!")
 	self.queue_free()
 	
 
