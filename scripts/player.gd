@@ -39,11 +39,14 @@ var movement_mode = "idle"
 var is_grounded
 var was_grounded
 
-const RUN_SPEED    = 4
-const MAX_VELOCITY = 11
-const JUMP_FORCE   = 5
-const BOUNCE_FORCE = 3 # Likely to be enemy specific in the future
-const GRAVITY      = 8 # Opposes jump force
+#const RUN_SPEED    = 400
+const RUN_SPEED    = 220
+const MAX_VELOCITY = 1100
+#const JUMP_FORCE   = 500
+const JUMP_FORCE   = 220
+const BOUNCE_FORCE = 100 # Likely to be enemy specific in the future
+#const GRAVITY      = 800 # Opposes jump force
+const GRAVITY      = 400 # Opposes jump force
 
 var jump_count = 0
 var max_jump_count = 2
@@ -85,7 +88,7 @@ func _fixed_process(delta):
 	velocity = velocity.normalized() * min(velocity.length(), MAX_VELOCITY)
 	
 	# Try to move initially
-	move_remainder = move(velocity) # move(velocity) returns the remainder of movement after collision
+	move_remainder = move(velocity * delta) # Returns the remainder of movement after collision
 	
 	if is_colliding():
 		is_grounded = true
@@ -96,7 +99,7 @@ func _fixed_process(delta):
 		colliding_body = get_collider()
 		
 		velocity = collide_normal.slide(move_remainder)
-		move(velocity)
+		move(velocity * delta)
 		
 		# Should be done with signalling instead
 		if colliding_body.is_in_group("Enemies"):
