@@ -20,8 +20,9 @@ func _ready():
 	
 
 func _fixed_process(delta):
-	if get_collider():
-		print("Oof ow ouch.")
+#	if get_collider():
+#		print("Oof ow ouch.")
+	pass
 	
 
 func _set_monster_class(type):
