@@ -3,15 +3,15 @@ extends KinematicBody2D
 # Should extend a particle script instead
 
 var spawner
-var start_velocity = 100
 var direction = 0
 #var lifespan = 0
 var timers
 
 # Times overlap - ie fireball despawns 4 seconds after creation
-const TIME_TO_START_FLICKER = 2.5
+const START_VELOCITY = 200
+const TIME_TO_START_FLICKER = 1
 const FLICKER_INTERVAL = 0.05
-const TIME_TO_DIE = 3
+const TIME_TO_DIE = 1.4
 
 onready var sprite_node = self.get_node("Sprite")
 
@@ -24,7 +24,7 @@ func _ready():
 
 func _fixed_process(delta):
 	if direction:
-		move(Vector2(direction * start_velocity * delta, 0))
+		move(Vector2(direction * START_VELOCITY * delta, 0))
 	
 
 func set_direction(object_direction):
