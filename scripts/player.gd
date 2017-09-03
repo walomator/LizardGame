@@ -38,16 +38,19 @@ var colliding_body
 var is_moving = false # Running implies specifically FAST running, to be considered if there will be multiple speeds
 var movement_mode = "idle"
 var is_grounded = true
-var was_grounded = true
+#var was_grounded = true
+var time_since_grounded = 0
 
-#const RUN_SPEED    = 220
-const RUN_SPEED    = 1000
-const MAX_VELOCITY = 1100
-#const JUMP_FORCE   = 220
-const JUMP_FORCE   = 1000
-const BOUNCE_FORCE = 100 # Likely to be enemy specific in the future
-#const GRAVITY      = 400 # Opposes jump force
-const GRAVITY      = 1000
+var debug_timer = 0 # For debugging only
+
+const RUN_SPEED    = 240
+#const RUN_SPEED    = 1000
+const MAX_VELOCITY = 600
+const JUMP_FORCE   = 290
+#const JUMP_FORCE   = 1000
+const BOUNCE_FORCE = 200 # Likely to be enemy specific in the future
+const GRAVITY      = 400 # Opposes jump force
+#const GRAVITY      = 1000
 
 var jump_count = 0
 var max_jump_count = 2
@@ -87,14 +90,21 @@ func _fixed_process(delta):
 	# Maximize speed a character can be moved by forces
 	velocity = velocity.normalized() * min(velocity.length(), MAX_VELOCITY)
 	
+#	# Code for debugging
+#	debug_timer += delta
+#	if debug_timer >= 1:
+#		debug_timer = 0
+#		print(velocity)
+		
 	# Try to move initially
 	move_remainder = move(velocity * delta) # Returns the remainder of movement after collision
 	
 	if is_colliding():
 		is_grounded = true
-		if is_grounded != was_grounded:
+#		if is_grounded != was_grounded:
+		if time_since_grounded != 0:
 			set_direction()
-		was_grounded = true
+		time_since_grounded = 0
 		collide_normal = get_collision_normal()
 		colliding_body = get_collider()
 		
@@ -115,18 +125,20 @@ func _fixed_process(delta):
 		# End if colliding_body.is_in_group("Enemies"):else
 		
 	else:
-		if debug == true:
-			print("----------")
-			print("Not colliding.")
-			print("Remainder: " + str(move_remainder))
-			is_grounded = false
-			print("is_grounded: " + str(is_grounded))
-			print("was_grounded: " + str(was_grounded))
-		if is_grounded != was_grounded:
-			if debug == true:
-				print("Setting direction")
+		time_since_grounded += delta
+#		if debug == true:
+#			print("----------")
+#			print("Not colliding.")
+#			print("Remainder: " + str(move_remainder))
+#			is_grounded = false
+#			print("is_grounded: " + str(is_grounded))
+#			print("was_grounded: " + str(was_grounded))
+#		if is_grounded != was_grounded:
+		if is_grounded and time_since_grounded > 0.01:
 			set_direction()
-		was_grounded = false
+#			if debug == true:
+#				print("Setting direction")
+		is_grounded = false
 		if jump_count == 0: # If player fell off a ledge
 			jump_count = 1
 	# End if is_colliding():else
