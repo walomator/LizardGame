@@ -7,7 +7,20 @@
 # Sticky Walls and Floors
 #	Replicable: y
 #	Pressing against walls while falling slows a player
-#	Running is slower than jumping
+#	Running causes jerky movement.
+#	  Likely has to do with character only sliding on floor some of the time
+
+# Hopping Mad Bug
+#	Replicable: universal
+#	Player collides on ground, slides on ground, then somehow stops colliding
+#	  on ground, causing a couple bugs:
+#	  Player's air animation would continuously flicker (fixed by requiring a time)
+#	  Movement is jerky on ground
+
+# Believe in Yourself Bug
+#	Replicable: y
+#	Running off a ledge makes the run animation continue to play
+
 
 
 extends KinematicBody2D
@@ -38,16 +51,19 @@ var colliding_body
 var is_moving = false # Running implies specifically FAST running, to be considered if there will be multiple speeds
 var movement_mode = "idle"
 var is_grounded = true
-var was_grounded = true
+#var was_grounded = true
+var time_since_grounded = 0
 
-#const RUN_SPEED    = 220
-const RUN_SPEED    = 1000
-const MAX_VELOCITY = 1100
-#const JUMP_FORCE   = 220
-const JUMP_FORCE   = 1000
-const BOUNCE_FORCE = 100 # Likely to be enemy specific in the future
-#const GRAVITY      = 400 # Opposes jump force
-const GRAVITY      = 1000
+var debug_timer = 0 # For debugging only
+
+const RUN_SPEED    = 260
+#const RUN_SPEED    = 1000
+const MAX_VELOCITY = 600
+const JUMP_FORCE   = 320
+#const JUMP_FORCE   = 1000
+const BOUNCE_FORCE = 200 # Likely to be enemy specific in the future
+const GRAVITY      = 500 # Opposes jump force
+#const GRAVITY      = 1000
 
 var jump_count = 0
 var max_jump_count = 2
@@ -76,6 +92,9 @@ func _ready():
 	
 
 func _fixed_process(delta):
+	# Timer for debugging, reset at 1 second at the end of _fixed_process
+	debug_timer += delta
+	
 	# Increase velocity due to gravity and other forces
 	velocity.x = RUN_SPEED * direction + force_x # Missing delta
 	velocity.y += GRAVITY * delta + force_y # v(t) = G*t + C
@@ -87,18 +106,24 @@ func _fixed_process(delta):
 	# Maximize speed a character can be moved by forces
 	velocity = velocity.normalized() * min(velocity.length(), MAX_VELOCITY)
 	
+#	# Code for debugging
+#	if debug_timer >= 1:
+#		print(velocity)
+		
 	# Try to move initially
 	move_remainder = move(velocity * delta) # Returns the remainder of movement after collision
 	
 	if is_colliding():
 		is_grounded = true
-		if is_grounded != was_grounded:
+#		if is_grounded != was_grounded:
+		if time_since_grounded != 0:
 			set_direction()
-		was_grounded = true
+		time_since_grounded = 0
 		collide_normal = get_collision_normal()
 		colliding_body = get_collider()
 		
 		velocity = collide_normal.slide(move_remainder)
+		print(velocity * delta)
 		move(velocity * delta)
 		
 		# Should be done with signalling instead
@@ -115,22 +140,27 @@ func _fixed_process(delta):
 		# End if colliding_body.is_in_group("Enemies"):else
 		
 	else:
-		if debug == true:
-			print("----------")
-			print("Not colliding.")
-			print("Remainder: " + str(move_remainder))
-			is_grounded = false
-			print("is_grounded: " + str(is_grounded))
-			print("was_grounded: " + str(was_grounded))
-		if is_grounded != was_grounded:
-			if debug == true:
-				print("Setting direction")
+		time_since_grounded += delta
+#		if debug == true:
+#			print("----------")
+#			print("Not colliding.")
+#			print("Remainder: " + str(move_remainder))
+#			is_grounded = false
+#			print("is_grounded: " + str(is_grounded))
+#			print("was_grounded: " + str(was_grounded))
+#		if is_grounded != was_grounded:
+		if is_grounded and time_since_grounded > 0.01:
 			set_direction()
-		was_grounded = false
+			is_grounded = false
+#			if debug == true:
+#				print("Setting direction")
 		if jump_count == 0: # If player fell off a ledge
 			jump_count = 1
 	# End if is_colliding():else
 	
+	# Reset debug_timer after it accumulates 1 second
+	if debug_timer >= 1:
+		debug_timer = 0
 
 func _input(event):
 	if direction:
@@ -201,7 +231,7 @@ func get_last_direction():
 	return player_direction
 	
 
-func set_direction(player_direction = "update"):
+func set_direction(player_direction = "update"): # Decides how to update sprite
 	direction = 0
 	if "right" in action.get_actions():
 		direction += 1
@@ -227,7 +257,7 @@ func set_direction(player_direction = "update"):
 		flip_sprite(true)
 	
 
-func switch_mode(character_mode):
+func switch_mode(character_mode): # Updates sprite
 	if character_mode == "still":
 		move_anim_node.stop()
 		fall_anim_node.stop()
