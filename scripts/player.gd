@@ -33,9 +33,11 @@ var idle_sprite_node # Safe to initialize in the _ready() function
 var move_anim_node
 var fall_anim_node
 var scoreboard_node
+var collision_handler_node
 
 signal attacked_enemy
 signal bumped_enemy
+signal body_collided
 #signal passed_end_level
 
 var direction = 0 # 0 = stationary, 1 = right, -1 = left
@@ -70,6 +72,7 @@ var max_jump_count = 2
 
 var path_to_protagonist_node = "/root/World/Protagonist/"
 var path_to_scoreboard_node = "/root/World/Scoreboard/"
+var path_to_collision_handler_node = "/root/World/CollisionHandler"
 
 var idle_sprite_node_name = "IdleSprite/"
 var move_anim_node_name = "RunAnim/"
@@ -85,15 +88,17 @@ func _ready():
 	move_anim_node =  get_node(path_to_protagonist_node + move_anim_node_name)
 	fall_anim_node =  get_node(path_to_protagonist_node + fall_anim_node_name)
 	scoreboard_node = get_node(path_to_scoreboard_node)
-	self.connect("attacked_enemy", scoreboard_node, "handle_attacked_enemy", [])
-	self.connect("bumped_enemy", scoreboard_node, "handle_bumped_enemy", [])
-	
+	collision_handler_node = get_node(path_to_collision_handler_node)
+
+	self.connect("attacked_enemy", scoreboard_node, "handle_attacked_enemy") # BUG - Being phased out
+	self.connect("bumped_enemy", scoreboard_node, "handle_bumped_enemy") # BUG - Being phased out
+	self.connect("body_collided", collision_handler_node, "handle_body_collided")
 	action = ActionHolder.new()
 	
 
 func _fixed_process(delta):
-	# Timer for debugging, reset at 1 second at the end of _fixed_process
-	debug_timer += delta
+#	# Timer for debugging, reset at 1 second at the end of _fixed_process
+#	debug_timer += delta
 	
 	# Increase velocity due to gravity and other forces
 	velocity.x = RUN_SPEED * direction + force_x 
@@ -106,15 +111,15 @@ func _fixed_process(delta):
 	# Maximize speed a character can be moved by forces
 	velocity = velocity.normalized() * min(velocity.length(), MAX_VELOCITY)
 	
-	# Try to move initially
-	move_remainder = move(velocity * delta) # Returns the remainder of movement after collision
+	# Try to move initially. Move returns the remainder of movement after collision
+	move_remainder = move(velocity * delta) 
 
 	# If there is a collision, there will be a nonzero move_remainder and is_colliding will return true
 	if is_colliding():
 		collide_normal = get_collision_normal()
 		colliding_body = get_collider()
 		
-		if collide_normal.x == 0:
+		if collide_normal.x == 0: # Collision on flat surface
 			is_grounded = true
 			if time_since_grounded != 0:
 				update_direction()
@@ -123,11 +128,11 @@ func _fixed_process(delta):
 		move_remainder = collide_normal.slide(move_remainder)
 		move(move_remainder)
 		
-		# Should be done with signalling instead
 		if colliding_body.is_in_group("Enemies"):
-			handle_enemy_collided()
-		else:
-			# This should be rewritten in cleaner code
+			handle_body_collided(colliding_body)
+
+		else: # Colliding with terrain
+			# Prevent velocity from accumulating on the ground
 			velocity.y = collide_normal.slide(Vector2(0, velocity.y)).y
 			
 			if collide_normal == Vector2(0, -1): # Can't refill jump_count on slopes
@@ -138,25 +143,16 @@ func _fixed_process(delta):
 		
 	else:
 		time_since_grounded += delta
-#		if debug == true:
-#			print("----------")
-#			print("Not colliding.")
-#			print("Remainder: " + str(move_remainder))
-#			is_grounded = false
-#			print("is_grounded: " + str(is_grounded))
-#			print("was_grounded: " + str(was_grounded))
 		if is_grounded and time_since_grounded > 0.00:
 			update_direction()
 			is_grounded = false
-#			if debug == true:
-#				print("Setting direction")
 		if jump_count == 0: # If player fell off a ledge
 			jump_count = 1
 	# End if is_colliding():else
 	
-	# Reset debug_timer after it accumulates 1 second
-	if debug_timer >= 1:
-		debug_timer = 0
+#	# Reset debug_timer after it accumulates 1 second
+#	if debug_timer >= 1:
+#		debug_timer = 0
 
 func _input(event):
 	if direction:
@@ -281,16 +277,18 @@ func reset_position():
 	velocity = Vector2(0, 0)
 	
 
-func handle_enemy_collided():
-	if collide_normal == Vector2(0, -1): # Landed from above
-		emit_signal("attacked_enemy")
-		is_grounded = false
-		velocity = Vector2(0, 0)
-		force_y = -BOUNCE_FORCE # Fixed bounciness, no matter the fall distance
-		jump_count = 1
-	else:
-		emit_signal("bumped_enemy")
-		velocity.y = collide_normal.slide(Vector2(0, velocity.y)).y
+func handle_body_collided(colliding_body):
+	emit_signal("body_collided", self, colliding_body)
+
+#	if collide_normal == Vector2(0, -1): # Landed from above
+#		emit_signal("attacked_enemy")
+#		is_grounded = false
+#		velocity = Vector2(0, 0)
+#		force_y = -BOUNCE_FORCE # Fixed bounciness, no matter the fall distance
+#		jump_count = 1
+#	else:
+#		emit_signal("bumped_enemy")
+#		velocity.y = collide_normal.slide(Vector2(0, velocity.y)).y
 	
 
 func launch_particle(particle_type):

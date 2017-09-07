@@ -5,14 +5,12 @@ var idle_anim_node
 var collision_box_node
 var monster_type
 
-#var Monster
+signal collided_with_body
 
 
 func _ready():
 	set_fixed_process(true)
 	monster_type = get_name()
-	# Stop what you're doing and use subclasses instead
-#	_set_monster_class(monster_type)
 	
 	idle_anim_node = get_node("IdleAnim/")
 	collision_box_node = get_node("CollisionShape2D")
@@ -20,16 +18,20 @@ func _ready():
 	
 
 func _fixed_process(delta):
-#	if get_collider():
-#		print("Oof ow ouch.")
-	pass
+#	move(Vector2(5, 0)*delta)
+	if is_colliding():
+		print("Oof ow ouch.")
 	
 
-func _set_monster_class(type):
-#	if type == "Slime":
-#		Monster = load("res://scripts/slime.gd")
-#	elif type == "Goblin":
-#		Monster = load("res://scripts/goblin.gd")
-#	else:
-#		pass # Should have a fallback to prevent crashes
-	pass
+func flash(mode):
+	if mode == "death":
+		print("Enemy defeated.")
+		die()
+	
+
+func die():
+	for child in get_children():
+		child.queue_free() # BUG - Is this necessary?
+	self.queue_free()
+
+
