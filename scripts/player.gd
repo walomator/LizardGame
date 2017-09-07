@@ -96,7 +96,7 @@ func _fixed_process(delta):
 	debug_timer += delta
 	
 	# Increase velocity due to gravity and other forces
-	velocity.x = RUN_SPEED * direction + force_x # Missing delta
+	velocity.x = RUN_SPEED * direction + force_x 
 	velocity.y += GRAVITY * delta + force_y # v(t) = G*t + C
 	
 	# Clear forces after being applied to velocity
@@ -106,29 +106,26 @@ func _fixed_process(delta):
 	# Maximize speed a character can be moved by forces
 	velocity = velocity.normalized() * min(velocity.length(), MAX_VELOCITY)
 	
-#	# Code for debugging
-#	if debug_timer >= 1:
-#		print(velocity)
-		
 	# Try to move initially
 	move_remainder = move(velocity * delta) # Returns the remainder of movement after collision
-	
+
+	# If there is a collision, there will be a nonzero move_remainder and is_colliding will return true
 	if is_colliding():
-		is_grounded = true
-#		if is_grounded != was_grounded:
-		if time_since_grounded != 0:
-			set_direction()
-		time_since_grounded = 0
 		collide_normal = get_collision_normal()
 		colliding_body = get_collider()
 		
-		velocity = collide_normal.slide(move_remainder)
-		print(velocity * delta)
-		move(velocity * delta)
+		if collide_normal.x == 0:
+			is_grounded = true
+			if time_since_grounded != 0:
+				update_direction()
+			time_since_grounded = 0
+		
+		move_remainder = collide_normal.slide(move_remainder)
+		move(move_remainder)
 		
 		# Should be done with signalling instead
 		if colliding_body.is_in_group("Enemies"):
-			handle_enemy_collision()
+			handle_enemy_collided()
 		else:
 			# This should be rewritten in cleaner code
 			velocity.y = collide_normal.slide(Vector2(0, velocity.y)).y
@@ -148,9 +145,8 @@ func _fixed_process(delta):
 #			is_grounded = false
 #			print("is_grounded: " + str(is_grounded))
 #			print("was_grounded: " + str(was_grounded))
-#		if is_grounded != was_grounded:
-		if is_grounded and time_since_grounded > 0.01:
-			set_direction()
+		if is_grounded and time_since_grounded > 0.00:
+			update_direction()
 			is_grounded = false
 #			if debug == true:
 #				print("Setting direction")
@@ -170,24 +166,24 @@ func _input(event):
 	if event.is_action_pressed("move_right"):
 #		print("right")
 		action.add("right")
-		set_direction("right")
+		update_direction("right")
 	if event.is_action_pressed("move_left"):
 #		print("left")
 		action.add("left")
-		set_direction("left")
+		update_direction("left")
 	if event.is_action_released("move_right"):
 		print("right released")
 		action.remove("right")
-		set_direction()
+		update_direction()
 	if event.is_action_released("move_left"):
 		print("left released")
 		action.remove("left")
-		set_direction()
+		update_direction()
 	
 	if event.is_action_pressed("move_up") and jump_count < max_jump_count:
 		print("jump")
 		is_grounded = false
-		set_direction()
+		update_direction()
 		velocity = Vector2(0, 0)
 		force_y = -JUMP_FORCE
 		jump_count += 1
@@ -231,7 +227,7 @@ func get_last_direction():
 	return player_direction
 	
 
-func set_direction(player_direction = "update"): # Decides how to update sprite
+func update_direction(player_direction = "update"): # Decides how to update sprite
 	direction = 0
 	if "right" in action.get_actions():
 		direction += 1
@@ -285,7 +281,7 @@ func reset_position():
 	velocity = Vector2(0, 0)
 	
 
-func handle_enemy_collision():
+func handle_enemy_collided():
 	if collide_normal == Vector2(0, -1): # Landed from above
 		emit_signal("attacked_enemy")
 		is_grounded = false
