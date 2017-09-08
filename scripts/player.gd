@@ -129,7 +129,7 @@ func _fixed_process(delta):
 		move(move_remainder)
 		
 		if colliding_body.is_in_group("Enemies"):
-			handle_body_collided(colliding_body)
+			handle_body_collided(colliding_body, collide_normal)
 
 		else: # Colliding with terrain
 			# Prevent velocity from accumulating on the ground
@@ -277,8 +277,8 @@ func reset_position():
 	velocity = Vector2(0, 0)
 	
 
-func handle_body_collided(colliding_body):
-	emit_signal("body_collided", self, colliding_body)
+func handle_body_collided(colliding_body, collision_normal):
+	emit_signal("body_collided", self, colliding_body, collision_normal)
 
 #	if collide_normal == Vector2(0, -1): # Landed from above
 #		emit_signal("attacked_enemy")
