@@ -15,5 +15,6 @@ func handle_player_hit_enemy_top(player, enemy):
 	
 
 func handle_player_hit_enemy_side(player, enemy):
-	print("Enemy hit player.")
+#	print("Enemy hit player.")
+	print("Goblin hit player.")
 	

@@ -1,14 +1,33 @@
 extends Node2D
 
 
+# Needs protection against signal spamming
+
 signal player_hit_enemy_top
 signal player_hit_enemy_side
+
+onready var SimpleTimer = load("res://scripts/simple_timer.gd")
+
+const HIT_TIME = 0.1
+
+var recently_collided = []
+
 
 func _ready():
 	pass
 	
 
 func handle_body_collided(detecting, colliding, normal):
+	if detecting.get_name() in recently_collided or colliding.get_name() in recently_collided:
+		return
+	var detecting_timer = SimpleTimer.new()
+	recently_collided.append(detecting.get_name())
+	detecting_timer.start(self, detecting.get_name(), HIT_TIME)
+	
+	var colliding_timer = SimpleTimer.new()
+	recently_collided.append(colliding.get_name())
+	colliding_timer.start(self, colliding.get_name(), HIT_TIME)
+	
 	var is_detecting_player = detecting.is_in_group("Players")
 	var is_detecting_enemy = detecting.is_in_group("Enemies")
 	var is_colliding_player = colliding.is_in_group("Players")
@@ -48,3 +67,9 @@ func _handle_player_enemy_collided(detecting, colliding, normal):
 	self.disconnect("player_hit_enemy_side", detecting, "handle_player_hit_enemy_side")
 	self.disconnect("player_hit_enemy_top", colliding, "handle_player_hit_enemy_top")
 	self.disconnect("player_hit_enemy_side", colliding, "handle_player_hit_enemy_side")
+	
+
+func handle_timeout(object_timer, name):
+	recently_collided.erase(name)
+	
+	object_timer.queue_free()
