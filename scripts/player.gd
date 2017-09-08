@@ -262,11 +262,11 @@ func switch_mode(character_mode): # Updates sprite
 		print("character_mode: " + str(character_mode))
 	
 
-func bounce():
+func bounce(bounce_force): # Should be called externally
 	is_grounded = false
 	update_direction()
 	velocity = Vector2(0, 0)
-	force_y = -BOUNCE_FORCE # Fixed bounciness, no matter the fall distance
+	force_y = -bounce_force
 	jump_count = 1
 	
 
@@ -290,23 +290,13 @@ func debug():
 
 func handle_body_collided(colliding_body, collision_normal):
 	emit_signal("body_collided", self, colliding_body, collision_normal)
-
-#	if collide_normal == Vector2(0, -1): # Landed from above
-#		emit_signal("attacked_enemy")
-#		is_grounded = false
-#		velocity = Vector2(0, 0)
-#		force_y = -BOUNCE_FORCE # Fixed bounciness, no matter the fall distance
-#		jump_count = 1
-#	else:
-#		emit_signal("bumped_enemy")
-#		velocity.y = collide_normal.slide(Vector2(0, velocity.y)).y
 	
 
-func handle_player_hit_enemy_top():
+func handle_player_hit_enemy_top(player, enemy):
 	emit_signal("attacked_enemy")
-	bounce()
+	bounce(enemy.get_bounciness())
 	
 
-func handle_player_hit_enemy_side():
+func handle_player_hit_enemy_side(player, enemy):
 	emit_signal("bumped_enemy")
 	

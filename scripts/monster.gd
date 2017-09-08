@@ -7,6 +7,8 @@ var collision_box_node
 var monster_type
 var health = 1
 
+const BOUNCINESS = 100
+
 signal body_collided
 
 
@@ -28,16 +30,20 @@ func _fixed_process(delta):
 			emit_signal("body_collided", self, get_collider(), get_collision_normal())
 	
 
+func get_health():
+	return health
+	
+
+func get_bounciness():
+	return BOUNCINESS
+	
+
 func set_health(monster_health):
 	if monster_health > 0:
 		health = monster_health
 	else:
 		flash("death")
 	
-
-func get_health():
-	return health
-
 
 func flash(mode):
 	if mode == "death":

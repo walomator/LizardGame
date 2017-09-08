@@ -23,19 +23,26 @@ func handle_body_collided(detecting, colliding, normal):
 	
 
 func _handle_player_enemy_collided(detecting, colliding, normal):
+	var player
+	var enemy
+	if detecting.is_in_group("Players"):
+		player = detecting
+		enemy = colliding
+	else:
+		enemy = detecting
+		player = colliding
+		# Force the normal to be from enemy's collision box
+		normal = -normal
+	
 	self.connect("player_hit_enemy_top", detecting, "handle_player_hit_enemy_top")
 	self.connect("player_hit_enemy_side", detecting, "handle_player_hit_enemy_side")
 	self.connect("player_hit_enemy_top", colliding, "handle_player_hit_enemy_top")
 	self.connect("player_hit_enemy_side", colliding, "handle_player_hit_enemy_side")
 	
-	# Force the normal to be from enemy's collision box
-	if detecting.is_in_group("Enemies"):
-		normal = -normal
-	
 	if normal == Vector2(0, -1): # Player landed from above
-		emit_signal("player_hit_enemy_top")
+		emit_signal("player_hit_enemy_top", player, enemy)
 	elif normal == Vector2(1, 0) or normal == Vector2(-1, 0):
-		emit_signal("player_hit_enemy_side")
+		emit_signal("player_hit_enemy_side", player, enemy)
 	
 	self.disconnect("player_hit_enemy_top", detecting, "handle_player_hit_enemy_top")
 	self.disconnect("player_hit_enemy_side", detecting, "handle_player_hit_enemy_side")
