@@ -1,11 +1,14 @@
 extends KinematicBody2D
 
 # Should extend a particle script instead
+# Should create a simple_timer class for use here and with collision_handler
 
 var spawner
 var direction = 0
 #var lifespan = 0
-var timers
+
+var SimpleTimer = load("res://scripts/simple_timer.gd")
+
 
 # Times overlap - ie fireball despawns 4 seconds after creation
 const START_VELOCITY = 200
@@ -42,12 +45,15 @@ func set_spawner(object_spawner):
 	
 
 func start_timer(name, time):
-	var timer = Timer.new()
-	timer.connect("timeout", self, "handle_timeout", [timer, name])
-	self.add_child(timer)
-	timer.set_wait_time(time)
-	timer.set_one_shot(true)
-	timer.start()
+	var simple_timer = SimpleTimer.new()
+	simple_timer.start(self, name, time)
+	
+#	var timer = Timer.new()
+#	timer.connect("timeout", self, "handle_timeout")
+#	self.add_child(timer)
+#	timer.set_wait_time(time)
+#	timer.set_one_shot(true)
+#	timer.start()
 
 func flicker_switch():
 #	sprite_node.set_hidden(true)
