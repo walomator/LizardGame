@@ -1,16 +1,19 @@
 extends KinematicBody2D
 
 
+onready var collision_handler_node = get_node("/root/World/CollisionHandler")
 var idle_anim_node
 var collision_box_node
 var monster_type
 var health = 1
 
-signal collided_with_body
+signal body_collided
 
 
 func _ready():
 	set_fixed_process(true)
+	
+	self.connect("body_collided", collision_handler_node, "handle_body_collided")
 	monster_type = get_name()
 	
 	idle_anim_node = get_node("IdleAnim/")
@@ -21,7 +24,8 @@ func _ready():
 func _fixed_process(delta):
 #	move(Vector2(5, 0)*delta)
 	if is_colliding():
-		print("Oof ow ouch.")
+		if get_collider().is_in_group("Players"):
+			emit_signal("body_collided", self, get_collider(), get_collision_normal())
 	
 
 func set_health(monster_health):
