@@ -53,10 +53,7 @@ var colliding_body
 var is_moving = false # Running implies specifically FAST running, to be considered if there will be multiple speeds
 var movement_mode = "idle"
 var is_grounded = true
-#var was_grounded = true
 var time_since_grounded = 0
-
-var debug_timer = 0 # For debugging only
 
 const RUN_SPEED    = 260
 #const RUN_SPEED    = 1000
@@ -97,9 +94,6 @@ func _ready():
 	
 
 func _fixed_process(delta):
-#	# Timer for debugging, reset at 1 second at the end of _fixed_process
-#	debug_timer += delta
-	
 	# Increase velocity due to gravity and other forces
 	velocity.x = RUN_SPEED * direction + force_x 
 	velocity.y += GRAVITY * delta + force_y # v(t) = G*t + C
@@ -119,28 +113,27 @@ func _fixed_process(delta):
 		collide_normal = get_collision_normal()
 		colliding_body = get_collider()
 		
-		if collide_normal.x == 0: # Collision on flat surface
+		# Make appropriate changes if colliding surface is horizontal
+		if collide_normal == Vector2(0, -1):
 			is_grounded = true
 			if time_since_grounded != 0:
 				update_direction()
 			time_since_grounded = 0
+			jump_count = 0
+		else:
+			time_since_grounded += delta
+			if is_grounded and time_since_grounded > 0.00:
+				update_direction()
+				is_grounded = false
 		
 		move_remainder = collide_normal.slide(move_remainder)
 		move(move_remainder)
 		
+		# Prevent incorrect acceleration due to gravity on surfaces 
+		velocity.y = collide_normal.slide(Vector2(0, velocity.y)).y
+		
 		if colliding_body.is_in_group("Enemies"):
 			handle_body_collided(colliding_body, collide_normal)
-
-		else: # Colliding with terrain
-			# Prevent velocity from accumulating on the ground
-			velocity.y = collide_normal.slide(Vector2(0, velocity.y)).y
-			
-			if collide_normal == Vector2(0, -1): # Can't refill jump_count on slopes
-				jump_count = 0
-			else:
-				is_grounded = false
-		# End if colliding_body.is_in_group("Enemies"):else
-		
 	else:
 		time_since_grounded += delta
 		if is_grounded and time_since_grounded > 0.00:
@@ -150,9 +143,6 @@ func _fixed_process(delta):
 			jump_count = 1
 	# End if is_colliding():else
 	
-#	# Reset debug_timer after it accumulates 1 second
-#	if debug_timer >= 1:
-#		debug_timer = 0
 
 func _input(event):
 	if direction:
@@ -302,4 +292,12 @@ func launch_particle(particle_type):
 
 func debug():
 	print(velocity)
+	
+
+func handle_player_hit_enemy_top():
+	print("Player stomped enemy.")
+	
+
+func handle_player_hit_enemy_side():
+	print("Player got hit.")
 	
