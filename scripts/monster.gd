@@ -31,6 +31,8 @@ func _fixed_process(delta):
 func set_health(monster_health):
 	if monster_health > 0:
 		health = monster_health
+	else:
+		flash("death")
 	
 
 func get_health():
@@ -44,8 +46,5 @@ func flash(mode):
 	
 
 func die():
-	for child in get_children():
-		child.queue_free() # BUG - Is this necessary?
 	self.queue_free()
-
-
+	
