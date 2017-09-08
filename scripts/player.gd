@@ -262,9 +262,30 @@ func switch_mode(character_mode): # Updates sprite
 		print("character_mode: " + str(character_mode))
 	
 
+func bounce():
+	is_grounded = false
+	update_direction()
+	velocity = Vector2(0, 0)
+	force_y = -BOUNCE_FORCE # Fixed bounciness, no matter the fall distance
+	jump_count = 1
+	
+
 func reset_position():
 	self.set_pos(Vector2(start_pos_x, start_pos_y))
 	velocity = Vector2(0, 0)
+	
+
+func launch_particle(particle_type):
+	if particle_type == "fireball":
+		var particle = fireball_scene.instance()
+		get_tree().get_root().add_child(particle)
+		particle.set_direction(self.get_last_direction())
+		particle.set_spawner("Protagonist")
+		particle.set_pos(self.get_pos()) # BUG - Not centered
+		
+
+func debug():
+	print(velocity)
 	
 
 func handle_body_collided(colliding_body, collision_normal):
@@ -281,23 +302,11 @@ func handle_body_collided(colliding_body, collision_normal):
 #		velocity.y = collide_normal.slide(Vector2(0, velocity.y)).y
 	
 
-func launch_particle(particle_type):
-	if particle_type == "fireball":
-		var particle = fireball_scene.instance()
-		get_tree().get_root().add_child(particle)
-		particle.set_direction(self.get_last_direction())
-		particle.set_spawner("Protagonist")
-		particle.set_pos(self.get_pos()) # BUG - Not centered
-		
-
-func debug():
-	print(velocity)
-	
-
 func handle_player_hit_enemy_top():
-	print("Player stomped enemy.")
+	emit_signal("attacked_enemy")
+	bounce()
 	
 
 func handle_player_hit_enemy_side():
-	print("Player got hit.")
+	emit_signal("bumped_enemy")
 	

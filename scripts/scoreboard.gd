@@ -19,12 +19,14 @@ func _write_scoreboard(scoreboard_message):
 
 
 func handle_attacked_enemy():
-	print("Enemy head smashed")
+#	print("Enemy head smashed.")
+	print("Player stomped enemy.")
 	_update_score(score + 5)
 	
 
 func handle_bumped_enemy():
-	print("You're toast!")
+#	print("You're toast!")
+	print("Enemy hit player.")
 	_update_score(0)
 	
 

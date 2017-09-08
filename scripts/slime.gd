@@ -2,7 +2,7 @@ extends "monster.gd"
 # parent class has _fixed_process
 
 const BOUNCINESS = 400
-const MAX_HEALTH = 20
+const MAX_HEALTH = 2
 
 
 func _ready():
