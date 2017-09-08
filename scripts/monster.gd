@@ -4,7 +4,6 @@ extends KinematicBody2D
 onready var collision_handler_node = get_node("/root/World/CollisionHandler")
 var idle_anim_node
 var collision_box_node
-var monster_type
 var health = 1
 
 const BOUNCINESS = 100
@@ -16,7 +15,6 @@ func _ready():
 	set_fixed_process(true)
 	
 	self.connect("body_collided", collision_handler_node, "handle_body_collided")
-	monster_type = get_name()
 	
 	idle_anim_node = get_node("IdleAnim/")
 	collision_box_node = get_node("CollisionShape2D")

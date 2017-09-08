@@ -4,6 +4,8 @@ extends "monster.gd"
 const BOUNCINESS = 200
 const MAX_HEALTH = 2
 
+onready var sound_node = get_node("Sound") 
+
 
 func _ready():
 	print("Slime loaded.")
@@ -20,6 +22,15 @@ func handle_player_hit_enemy_top(player, enemy):
 	
 
 func handle_player_hit_enemy_side(player, enemy):
-#	print("Enemy hit player.")
-	print("Slime hit player.")
+	pass
+	
+	
+func flash(mode):
+	if mode == "death":
+#		print("Slime defeated.")
+		sound_node.play("death")
+	
+
+func die():
+	self.queue_free()
 	
