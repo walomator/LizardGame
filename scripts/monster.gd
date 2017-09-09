@@ -1,15 +1,16 @@
 extends KinematicBody2D
 
+signal body_collided
 
 onready var collision_handler_node = get_node("/root/World/CollisionHandler")
+onready var sound_node = get_node("Sound") 
 var idle_anim_node
 var collision_box_node
 var health = 1
 
 const BOUNCINESS = 100
 
-signal body_collided
-
+const SimpleTimer = preload("res://scripts/simple_timer.gd")
 
 func _ready():
 	set_fixed_process(true)
@@ -40,13 +41,24 @@ func set_health(monster_health):
 	if monster_health > 0:
 		health = monster_health
 	else:
-		flash("death")
+		handle_death()
+	
+
+func start_timer(name, time):
+	var simple_timer = SimpleTimer.new()
+	simple_timer.start(self, name, time)
+	
+
+func handle_timeout():
+	pass # Overloaded in subclass
+	
+
+func handle_death():
+	die()
 	
 
 func flash(mode):
-	if mode == "death":
-		print("Enemy defeated.")
-		die()
+	pass
 	
 
 func die():

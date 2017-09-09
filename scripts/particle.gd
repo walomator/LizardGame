@@ -3,8 +3,6 @@ extends KinematicBody2D
 var spawner
 var direction = 0
 
-var SimpleTimer = load("res://scripts/simple_timer.gd")
-
 
 # Times overlap
 const START_VELOCITY = 0
@@ -13,6 +11,8 @@ const FLICKER_INTERVAL = 0
 const TIME_TO_DIE = 0
 
 onready var sprite_node = self.get_node("Sprite")
+
+var SimpleTimer = preload("res://scripts/simple_timer.gd")
 
 
 func _ready():

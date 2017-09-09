@@ -1,12 +1,22 @@
-[gd_scene load_steps=4 format=1]
+[gd_scene load_steps=6 format=1]
 
 [ext_resource path="res://scripts/goblin.gd" type="Script" id=1]
 [ext_resource path="res://scenes/monsters/goblin/IdleAnim.tres" type="SpriteFrames" id=2]
+[ext_resource path="res://sound/monsters/generic/death.wav" type="Sample" id=3]
 
 [sub_resource type="RectangleShape2D" id=1]
 
 custom_solver_bias = 0.0
 extents = Vector2( 9.38889, 8.18519 )
+
+[sub_resource type="SampleLibrary" id=2]
+
+samples/death = {
+"db": 0.0,
+"pitch": 1.0,
+"priority": 0,
+"sample": ExtResource( 3 )
+}
 
 [node name="Goblin" type="KinematicBody2D" groups=[
 "Enemies",
@@ -33,5 +43,16 @@ transform/scale = Vector2( 1.38462, 2.11131 )
 shape = SubResource( 1 )
 trigger = false
 _update_shape_index = 0
+
+[node name="Sound" type="SamplePlayer2D" parent="."]
+
+params/volume_db = 0.0
+params/pitch_scale = 1.0
+params/attenuation/min_distance = 1.0
+params/attenuation/max_distance = 2048.0
+params/attenuation/distance_exp = 1.0
+config/polyphony = 1
+config/samples = SubResource( 2 )
+config/pitch_random = 0.0
 
 
