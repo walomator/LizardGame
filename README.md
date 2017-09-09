@@ -10,27 +10,25 @@ Made in the Godot Engine, version 2.1.3, this project is currently in VERY early
 Week of 3 September 2017
 
 Rewrote physics
-
 Made enemies killable
 
 
 Current status: Pre-Alpha, active development
 
 Story:          none - yet
-
 Gameplay:       only barebones framework
-
 Level design:   No work has even been started
-
 Assets:         Good beginnings
 
 The game needs inspiration implemented as code. When it has more substance, it will be easier for outsiders to contribute.
+
 Currently, the two listed authors are heading the game's development. Open sourced early, this project is yet still too young to catch most people's interests, but if it catches yours, reader, star our project and check back in the months to come!
 
 
 ## Design philosophy
 
 The game is made as a labor of love. Code should be open sourced to share with others innovation and inspiration, and to assure a community isn't artificially limited from improving on the original creator's works.
+
 Art assets, so closely tied to the game's code, have also been made free to remix and reuse, to create a completely open source project anyone can feel welcome to contribute to.
 
 Right now, the original developers are exploring what can be done with grass roots game development, and our analysis so far is, it's pretty challenging.
