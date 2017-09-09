@@ -10,18 +10,14 @@ Made in the Godot Engine, version 2.1.3, this project is currently in VERY early
 Week of 3 September 2017
 
 Rewrote physics
-
 Made enemies killable
 
 
 Current status: Pre-Alpha, active development
 
 Story:          none - yet
-
 Gameplay:       only barebones framework
-
 Level design:   No work has even been started
-
 Assets:         Good beginnings
 
 
