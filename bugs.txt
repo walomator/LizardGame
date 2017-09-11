@@ -10,6 +10,9 @@ map-editing
 snap is not easy to configure (not a bug)
 
 movement
+
+Hitting ceiling messes with jump count
+
 67 If both directions are held down, the first direction gets priority.
 This causes problems when a direction button is released.
 
