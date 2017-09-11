@@ -55,13 +55,13 @@ var movement_mode = "idle"
 var is_grounded = true
 var time_since_grounded = 0
 
-const RUN_SPEED    = 260
+const RUN_SPEED    = 195
 #const RUN_SPEED    = 1000
 const MAX_VELOCITY = 600
-const JUMP_FORCE   = 320
+const JUMP_FORCE   = 260
 #const JUMP_FORCE   = 1000
 const BOUNCE_FORCE = 200 # Likely to be enemy specific in the future
-const GRAVITY      = 500 # Opposes jump force
+const GRAVITY      = 400 # Opposes jump force
 #const GRAVITY      = 1000
 
 var jump_count = 0
