@@ -7,15 +7,6 @@
 # Sticky Walls and Floors
 #	Replicable: y
 #	Pressing against walls while falling slows a player
-#	Running causes jerky movement.
-#	  Likely has to do with character only sliding on floor some of the time
-
-# Hopping Mad Bug
-#	Replicable: universal
-#	Player collides on ground, slides on ground, then somehow stops colliding
-#	  on ground, causing a couple bugs:
-#	  Player's air animation would continuously flicker (fixed by requiring a time)
-#	  Movement is jerky on ground
 
 # Believe in Yourself Bug
 #	Replicable: y
@@ -34,11 +25,15 @@ var move_anim_node
 var fall_anim_node
 var scoreboard_node
 var collision_handler_node
+var center_box_node
+var global_node
+var root_node
 
+signal exited_center_box
 signal attacked_enemy
 signal bumped_enemy
 signal body_collided
-#signal passed_end_level
+signal shutdown
 
 var direction = 0 # 0 = stationary, 1 = right, -1 = left
 var last_direction = 1 # The direction last moved, or the facing direction
@@ -67,35 +62,42 @@ const GRAVITY      = 400 # Opposes jump force
 var jump_count = 0
 var max_jump_count = 2
 
-var path_to_protagonist_node = "/root/World/Protagonist/"
-var path_to_scoreboard_node = "/root/World/Scoreboard/"
-var path_to_collision_handler_node = "/root/World/CollisionHandler"
-
-var idle_sprite_node_name = "IdleSprite/"
-var move_anim_node_name = "RunAnim/"
-var fall_anim_node_name = "FallAnim/"
-
 var ActionHolder = preload("res://scripts/action_holder.gd")
 var action
 
 func _ready():
 	set_fixed_process(true)
 	set_process_input(true)
-	idle_sprite_node = get_node(path_to_protagonist_node + idle_sprite_node_name)
-	move_anim_node =  get_node(path_to_protagonist_node + move_anim_node_name)
-	fall_anim_node =  get_node(path_to_protagonist_node + fall_anim_node_name)
-	scoreboard_node = get_node(path_to_scoreboard_node)
+	
+	var path_to_protagonist_node = "/root/World/Protagonist/"
+	var path_to_scoreboard_node = "/root/World/Scoreboard/"
+	var path_to_collision_handler_node = "/root/World/CollisionHandler/"
+	var path_to_center_box_node = "/root/World/CenterBox/"
+	var path_to_global_node = "/root/Global/"
+	var idle_sprite_node_name = "IdleSprite/"
+	var move_anim_node_name = "RunAnim/"
+	var fall_anim_node_name = "FallAnim/"
+	
+	idle_sprite_node       = get_node(path_to_protagonist_node + idle_sprite_node_name)
+	move_anim_node         = get_node(path_to_protagonist_node + move_anim_node_name)
+	fall_anim_node         = get_node(path_to_protagonist_node + fall_anim_node_name)
+	scoreboard_node        = get_node(path_to_scoreboard_node)
 	collision_handler_node = get_node(path_to_collision_handler_node)
-
-	self.connect("attacked_enemy", scoreboard_node, "handle_attacked_enemy") # BUG - Being phased out
-	self.connect("bumped_enemy", scoreboard_node, "handle_bumped_enemy") # BUG - Being phased out
+	global_node            = get_node(path_to_global_node)
+	root_node              = get_node("/root/")
+	center_box_node        = get_node(path_to_center_box_node)
+	
+	root_node.call_deferred("add_child", center_box_node)
+	
 	self.connect("body_collided", collision_handler_node, "handle_body_collided")
+	self.connect("shutdown", global_node, "handle_shutdown")
+#	self.connect("exited_center_box", global_node, "handle_exited_center_box")
 	action = ActionHolder.new()
 	
 
 func _fixed_process(delta):
 	# Increase velocity due to gravity and other forces
-	velocity.x = RUN_SPEED * direction + force_x 
+	velocity.x = RUN_SPEED * direction + force_x
 	velocity.y += GRAVITY * delta + force_y # v(t) = G*t + C
 	
 	# Clear forces after being applied to velocity
@@ -106,7 +108,7 @@ func _fixed_process(delta):
 	velocity = velocity.normalized() * min(velocity.length(), MAX_VELOCITY)
 	
 	# Try to move initially. Move returns the remainder of movement after collision
-	move_remainder = move(velocity * delta) 
+	move_remainder = move(velocity * delta)
 
 	# If there is a collision, there will be a nonzero move_remainder and is_colliding will return true
 	if is_colliding():
@@ -185,6 +187,9 @@ func _input(event):
 	
 	if event.is_action_pressed("debug"):
 		debug()
+
+	if event.is_action_pressed("shutdown"):
+		emit_signal("shutdown")
 	
 
 func flip_sprite(is_flipped):
