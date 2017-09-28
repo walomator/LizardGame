@@ -29,7 +29,7 @@ var center_box_node
 var global_node
 var root_node
 
-signal exited_center_box
+#signal exited_center_box
 signal attacked_enemy
 signal bumped_enemy
 signal body_collided
@@ -89,9 +89,13 @@ func _ready():
 	
 	root_node.call_deferred("add_child", center_box_node)
 	
-	self.connect("body_collided", collision_handler_node, "handle_body_collided")
 	self.connect("shutdown", global_node, "handle_shutdown")
+	self.connect("body_collided", collision_handler_node, "handle_body_collided")
+	
+	# If the body exiting the center box node is self, let global node move viewport
+#	center_box_node.connect("exited_center_box", self, "handle_exited_center_box")
 #	self.connect("exited_center_box", global_node, "handle_exited_center_box")
+	
 	action = ActionHolder.new()
 	
 
@@ -290,7 +294,7 @@ func launch_particle(particle_type):
 		
 
 func debug():
-	print(velocity)
+	print("I am de bug!")
 	
 
 func handle_body_collided(colliding_body, collision_normal):
@@ -305,3 +309,7 @@ func handle_player_hit_enemy_top(player, enemy):
 func handle_player_hit_enemy_side(player, enemy):
 	emit_signal("bumped_enemy")
 	
+
+#func handle_exited_center_node(exiting_body):
+#	if exiting_body == self:
+#		emit_signal("exited_center_box")
