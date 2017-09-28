@@ -18,7 +18,15 @@ script/script = ExtResource( 1 )
 
 [node name="Protagonist" parent="." instance=ExtResource( 2 )]
 
-[node name="CenterBox" type="Area2D" parent="."]
+[node name="CenterBox" type="KinematicBody2D" parent="."]
+
+input/pickable = false
+collision/layers = 1
+collision/mask = 1
+collision/margin = 0.08
+script/script = ExtResource( 3 )
+
+[node name="Area2D" type="Area2D" parent="CenterBox"]
 
 transform/pos = Vector2( 105, 144 )
 input/pickable = true
@@ -29,9 +37,8 @@ gravity_vec = Vector2( 0, 1 )
 gravity = 98.0
 linear_damp = 0.1
 angular_damp = 1.0
-script/script = ExtResource( 3 )
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="CenterBox"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CenterBox/Area2D"]
 
 transform/pos = Vector2( 1, 0 )
 shape = SubResource( 1 )

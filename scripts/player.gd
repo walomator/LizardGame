@@ -29,7 +29,6 @@ var center_box_node
 var global_node
 var root_node
 
-#signal exited_center_box
 signal attacked_enemy
 signal bumped_enemy
 signal body_collided
@@ -92,7 +91,7 @@ func _ready():
 	self.connect("shutdown", global_node, "handle_shutdown")
 	self.connect("body_collided", collision_handler_node, "handle_body_collided")
 	
-	# If the body exiting the center box node is self, let global node move viewport
+#	# If the body exiting the center box node is self, let global node move viewport
 #	center_box_node.connect("exited_center_box", self, "handle_exited_center_box")
 #	self.connect("exited_center_box", global_node, "handle_exited_center_box")
 	
@@ -294,7 +293,8 @@ func launch_particle(particle_type):
 		
 
 func debug():
-	print("I am de bug!")
+#	print("I am de bug!")
+	move(Vector2(10, 10))
 	
 
 func handle_body_collided(colliding_body, collision_normal):
