@@ -9,9 +9,10 @@ var area_node
 var area_collision_node
 var global_node
 var player_body
-var extents
-var x_pos
-var y_pos
+var extents # distance from center
+#var x_pos
+#var y_pos
+var center_pos
 var offset
 
 func _ready():
@@ -20,9 +21,11 @@ func _ready():
 	global_node = get_node("/root/Global/")
 	player_body = get_node("/root/World/Protagonist/")
 	
-	extents = Vector2(area_collision_node.get_shape().get_extents())
-	x_pos = self.get_pos().x
-	y_pos = self.get_pos().y
+#	extents = Vector2(area_collision_node.get_shape().get_extents())
+	extents = area_collision_node.get_shape().get_extents()
+	center_pos = Vector2(area_collision_node.get_global_pos().x + extents.x, area_collision_node.get_global_pos().y + extents.y)
+#	x_pos = self.get_global_pos().x
+#	y_pos = self.get_global_pos().y
 	
 	area_node.connect("body_exit", self, "handle_body_exit")
 	self.connect("exited_center_box", global_node, "handle_exited_center_box", [self])
@@ -31,10 +34,15 @@ func _ready():
 func handle_body_exit(exiting_body):
 	if exiting_body == player_body:
 		offset = Vector2(0, 0)
-		var player_pos = player_body.get_pos()
-		var exit_direction = NULL
-		var x_distance = player_pos.x - self.get_pos().x
-		var y_distance = player_pos.y - self.get_pos().y
+		
+		var player_coll = player_body.get_node("CollisionShape2D")
+		var player_extents = player_coll.get_shape().get_extents()
+		var player_pos = Vector2(player_coll.get_global_pos().x + player_extents.x, player_coll.get_global_pos().y + player_extents.y)
+		
+		
+#		var exit_direction = NULL
+		var x_distance = player_pos.x - center_pos.x
+		var y_distance = player_pos.y - center_pos.y
 		
 		if x_distance > extents.x:
 			offset.x += (x_distance - extents.x)
@@ -47,6 +55,7 @@ func handle_body_exit(exiting_body):
 			offset.y += (y_distance + extents.y)
 			
 		move(offset)
+		print(offset)
 		emit_signal("exited_center_box")
 		
 		
