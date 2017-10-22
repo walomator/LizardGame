@@ -2,7 +2,7 @@ extends Node2D
 
 var root_node
 var player_node
-var center_box_node
+#var center_box_node
 var resolution
 
 enum {TOP, BOTTOM, LEFT, RIGHT}
@@ -10,7 +10,7 @@ enum {TOP, BOTTOM, LEFT, RIGHT}
 func _ready():
 	root_node = get_node("/root/")
 	player_node = get_node("/root/World/Protagonist/")
-	center_box_node = get_node("/root/World/CenterBox")
+#	center_box_node = get_node("/root/World/CenterBox")
 	
 	resolution = Vector2(Globals.get("display/width"), Globals.get("display/height"))
 	
