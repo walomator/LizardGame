@@ -9,6 +9,13 @@ const PLAY_DEAD_TIME = 0.4
 
 func _ready():
 	set_health(MAX_HEALTH)
+	set_fixed_process(true)
+	
+	self.connect("body_collided", collision_handler_node, "handle_body_collided")
+	
+	idle_anim_node = get_node("IdleAnim/")
+	collision_box_node = get_node("CollisionShape2D")
+	idle_anim_node.play()
 	
 
 func handle_death():

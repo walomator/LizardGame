@@ -1,3 +1,6 @@
+extends "creature.gd"
+
+
 # Buglist
 # Running Man Bug
 #	Replicable: y
@@ -12,9 +15,6 @@
 #	Replicable: y
 #	Running off a ledge makes the run animation continue to play
 
-
-
-extends KinematicBody2D
 
 var debug = false
 
@@ -58,6 +58,7 @@ const JUMP_FORCE   = 260
 const BOUNCE_FORCE = 200 # Likely to be enemy specific in the future
 const GRAVITY      = 400 # Opposes jump force
 #const GRAVITY      = 1000
+const MAX_HEALTH = 3
 
 var jump_count = 0
 var max_jump_count = 2
@@ -65,7 +66,14 @@ var max_jump_count = 2
 var ActionHolder = preload("res://scripts/action_holder.gd")
 var action
 
+var name = "Protagonist"
+
 func _ready():
+	print("In ready of player.gd")
+	print(self.name)
+	print(self.health)
+	set_health(MAX_HEALTH)
+	
 	set_fixed_process(true)
 	set_process_input(true)
 	
@@ -287,7 +295,7 @@ func launch_particle(particle_type):
 		particle.set_direction(self.get_last_direction())
 		particle.set_spawner("Protagonist")
 		particle.set_pos(self.get_pos()) # BUG - Not centered
-		
+	
 
 func debug():
 	print(velocity)

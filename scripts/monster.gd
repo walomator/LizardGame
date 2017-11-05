@@ -23,7 +23,6 @@ func _ready():
 	
 
 func _fixed_process(delta):
-#	move(Vector2(5, 0)*delta)
 	if is_colliding():
 		if get_collider().is_in_group("Players"):
 			emit_signal("body_collided", self, get_collider(), get_collision_normal())
