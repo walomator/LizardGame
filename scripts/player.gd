@@ -1,4 +1,4 @@
-extends "creature.gd"
+extends "character.gd"
 
 
 # Buglist
@@ -99,7 +99,7 @@ func _ready():
 	
 	self.connect("body_collided", collision_handler_node, "handle_body_collided")
 	self.connect("shutdown", global_node, "handle_shutdown")
-#	self.connect("exited_center_box", global_node, "handle_exited_center_box")
+	self.connect("exited_center_box", global_node, "handle_exited_center_box")
 	action = ActionHolder.new()
 	
 

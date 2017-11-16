@@ -6,9 +6,9 @@ func _ready():
 	print("In ready of character.gd")
 	
 
-func set_heatlh(player_health):
-	if player_health > 0:
-		health = player_health
+func set_health(monster_health):
+	if monster_health > 0:
+		health = monster_health
 	else:
 		handle_death()
 	
@@ -19,3 +19,7 @@ func handle_death():
 
 func die():
 	self.queue_free()
+	
+
+
+

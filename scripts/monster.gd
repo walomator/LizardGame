@@ -13,6 +13,7 @@ const BOUNCINESS = 100
 const SimpleTimer = preload("res://scripts/simple_timer.gd")
 
 func _ready():
+	print("In ready of monster.gd")
 	set_fixed_process(true)
 	
 	self.connect("body_collided", collision_handler_node, "handle_body_collided")
