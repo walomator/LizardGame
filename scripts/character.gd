@@ -2,10 +2,6 @@ extends KinematicBody2D
 var health = 1
 
 
-func _ready():
-	print("In ready of character.gd")
-	
-
 func set_health(monster_health):
 	if monster_health > 0:
 		health = monster_health

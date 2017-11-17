@@ -15,6 +15,9 @@ extends "character.gd"
 #	Replicable: y
 #	Running off a ledge makes the run animation continue to play
 
+# Floating Bug
+#	Replicable: y
+#	Pressing against a monster repeatedly may cause the air animation to play
 
 var debug = false
 
@@ -51,13 +54,11 @@ var is_grounded = true
 var time_since_grounded = 0
 
 const RUN_SPEED    = 195
-#const RUN_SPEED    = 1000
 const MAX_VELOCITY = 600
 const JUMP_FORCE   = 260
-#const JUMP_FORCE   = 1000
 const BOUNCE_FORCE = 200 # Likely to be enemy specific in the future
+const HURT_FORCE   = 800
 const GRAVITY      = 400 # Opposes jump force
-#const GRAVITY      = 1000
 const MAX_HEALTH = 3
 
 var jump_count = 0
@@ -69,9 +70,6 @@ var action
 var name = "Protagonist"
 
 func _ready():
-	print("In ready of player.gd")
-	print(self.name)
-	print(self.health)
 	set_health(MAX_HEALTH)
 	
 	set_fixed_process(true)
@@ -113,6 +111,7 @@ func _fixed_process(delta):
 	force_y = 0
 	
 	# Maximize speed a character can be moved by forces
+	# BUG - This does not limit true speed, just speed for variable delta
 	velocity = velocity.normalized() * min(velocity.length(), MAX_VELOCITY)
 	
 	# Try to move initially. Move returns the remainder of movement after collision
@@ -142,7 +141,7 @@ func _fixed_process(delta):
 		# Prevent incorrect acceleration due to gravity on surfaces 
 		velocity.y = collide_normal.slide(Vector2(0, velocity.y)).y
 		
-		if colliding_body.is_in_group("Enemies"):
+		if colliding_body.is_in_group("Enemies"): # FEAT - Should be "Collidables"
 			handle_body_collided(colliding_body, collide_normal)
 	else:
 		time_since_grounded += delta
@@ -283,6 +282,14 @@ func bounce(bounce_force): # Should be called externally
 	jump_count = 1
 	
 
+func reel(reel_force):
+#	is_grounded = false
+#	update_direction()
+	velocity = Vector2(0, 0)
+	force_x = -reel_force
+#	jump_count = 1
+	print("Reeling!")
+
 func reset_position():
 	self.set_pos(Vector2(start_pos_x, start_pos_y))
 	velocity = Vector2(0, 0)
@@ -310,6 +317,5 @@ func handle_player_hit_enemy_top(player, enemy):
 	bounce(enemy.get_bounciness())
 	
 
-func handle_player_hit_enemy_side(player, enemy):
-	emit_signal("bumped_enemy")
-	
+func handle_player_hit_enemy_side(player, enemy, normal):
+	reel(HURT_FORCE)

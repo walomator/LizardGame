@@ -41,7 +41,7 @@ func handle_player_hit_enemy_top(player, enemy):
 	set_health(get_health() - 1) # FEAT - Should be dependent on player's damage
 	
 
-func handle_player_hit_enemy_side(player, enemy):
+func handle_player_hit_enemy_side(player, enemy, normal): # FEAT - Should be in monster.gd
 	pass
 	
 

@@ -44,7 +44,7 @@ func handle_body_collided(detecting, colliding, normal):
 func _handle_player_enemy_collided(detecting, colliding, normal):
 	var player
 	var enemy
-	if detecting.is_in_group("Players"):
+	if detecting.is_in_group("Players"): # FEAT - Shouldn't trust that anything not "Players" is "Enemies", though right "now" it is
 		player = detecting
 		enemy = colliding
 	else:
@@ -61,7 +61,7 @@ func _handle_player_enemy_collided(detecting, colliding, normal):
 	if normal == Vector2(0, -1): # Player landed from above
 		emit_signal("player_hit_enemy_top", player, enemy)
 	elif normal == Vector2(1, 0) or normal == Vector2(-1, 0):
-		emit_signal("player_hit_enemy_side", player, enemy)
+		emit_signal("player_hit_enemy_side", player, enemy, normal)
 	
 	self.disconnect("player_hit_enemy_top", detecting, "handle_player_hit_enemy_top")
 	self.disconnect("player_hit_enemy_side", detecting, "handle_player_hit_enemy_side")
