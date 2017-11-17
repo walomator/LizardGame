@@ -53,6 +53,14 @@ func handle_timeout():
 	pass # Overloaded in subclass
 	
 
+func handle_player_hit_enemy_top(player, enemy):
+	set_health(get_health() - 1) # FEAT - Should be dependent on player's damage
+	
+
+func handle_player_hit_enemy_side(player, enemy, normal):
+	pass
+	
+
 func handle_death():
 	die()
 	
