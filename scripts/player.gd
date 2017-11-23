@@ -52,19 +52,21 @@ var is_moving = false # Running implies specifically FAST running, to be conside
 var movement_mode = "idle"
 var is_grounded = true
 var time_since_grounded = 0
+var is_stunned = false
 
 const RUN_SPEED    = 195
 const MAX_VELOCITY = 600
 const JUMP_FORCE   = 260
 const BOUNCE_FORCE = 200 # Likely to be enemy specific in the future
-const HURT_FORCE   = 800
 const GRAVITY      = 400 # Opposes jump force
+const HURT_FORCE   = 800
+const STUN_TIME    = 0.5
 const MAX_HEALTH = 3
 
 var jump_count = 0
 var max_jump_count = 2
 
-var ActionHolder = preload("res://scripts/action_holder.gd")
+const ActionHolder = preload("res://scripts/action_holder.gd")
 var action
 
 var name = "Protagonist"
@@ -103,6 +105,7 @@ func _ready():
 
 func _fixed_process(delta):
 	# Increase velocity due to gravity and other forces
+	print(direction)
 	velocity.x = RUN_SPEED * direction + force_x
 	velocity.y += GRAVITY * delta + force_y # v(t) = G*t + C
 	
@@ -154,49 +157,57 @@ func _fixed_process(delta):
 	
 
 func _input(event):
-	if direction:
-		last_direction = direction
-	
-	# Input
-	if event.is_action_pressed("move_right"):
-#		print("right")
-		action.add("right")
-		update_direction("right")
-	if event.is_action_pressed("move_left"):
-#		print("left")
-		action.add("left")
-		update_direction("left")
-	if event.is_action_released("move_right"):
-		print("right released")
-		action.remove("right")
-		update_direction()
-	if event.is_action_released("move_left"):
-		print("left released")
-		action.remove("left")
-		update_direction()
-	
-	if event.is_action_pressed("move_up") and jump_count < max_jump_count:
-		print("jump")
-		is_grounded = false
-		update_direction()
-		velocity = Vector2(0, 0)
-		force_y = -JUMP_FORCE
-		jump_count += 1
-		# FEAT - Variable jump length needed
-	
-	if event.is_action_pressed("reset"):
-#		print("reset")
-		reset_position()
-	
-	if event.is_action_pressed("combat_action_1"):
-#		print("fireball")
-		launch_particle("fireball")
-	
-	if event.is_action_pressed("debug"):
-		debug()
-
 	if event.is_action_pressed("shutdown"):
 		emit_signal("shutdown")
+	
+	if is_stunned == false:
+		if direction:
+			last_direction = direction
+		
+		# Input
+		if event.is_action_pressed("move_right"):
+	#		print("right")
+			action.add("right")
+			update_direction("right")
+		if event.is_action_pressed("move_left"):
+	#		print("left")
+			action.add("left")
+			update_direction("left")
+		if event.is_action_released("move_right"):
+			print("right released")
+			action.remove("right")
+			update_direction()
+		if event.is_action_released("move_left"):
+			print("left released")
+			action.remove("left")
+			update_direction()
+		
+		if event.is_action_pressed("move_up") and jump_count < max_jump_count:
+			print("jump")
+			is_grounded = false
+			update_direction()
+			velocity = Vector2(0, 0)
+			force_y = -JUMP_FORCE
+			jump_count += 1
+			# FEAT - Variable jump length needed
+		
+		if event.is_action_pressed("reset"):
+	#		print("reset")
+			reset_position()
+		
+		if event.is_action_pressed("combat_action_1"):
+	#		print("fireball")
+			launch_particle("fireball")
+		
+		if event.is_action_pressed("debug"):
+			debug()
+	# End if is_stunned == false
+	
+
+func handle_timeout(object_timer, name): # Called by timer after it times out
+	if name == "unstun":
+		is_stunned = false
+	object_timer.queue_free()
 	
 
 func flip_sprite(is_flipped):
@@ -270,6 +281,8 @@ func switch_mode(character_mode): # Updates sprite
 		idle_sprite_node.set_hidden(true)
 		move_anim_node.set_hidden(true)
 		fall_anim_node.set_hidden(false)
+	elif character_mode == "stunned":
+		pass
 	if debug == true:
 		print("character_mode: " + str(character_mode))
 	
@@ -282,13 +295,18 @@ func bounce(bounce_force): # Should be called externally
 	jump_count = 1
 	
 
-func reel(reel_force):
+func reel(reel_force, normal):
+	is_stunned = true
 #	is_grounded = false
 #	update_direction()
 	velocity = Vector2(0, 0)
-	force_x = -reel_force
+	force_x = normal.x * reel_force
 #	jump_count = 1
-	print("Reeling!")
+	direction = 0
+	action.clear()
+	update_direction()
+	switch_mode("stunned")
+#	print("Reeling!")
 
 func reset_position():
 	self.set_pos(Vector2(start_pos_x, start_pos_y))
@@ -318,4 +336,5 @@ func handle_player_hit_enemy_top(player, enemy):
 	
 
 func handle_player_hit_enemy_side(player, enemy, normal):
-	reel(HURT_FORCE)
+	reel(HURT_FORCE, normal)
+	start_timer("unstun", STUN_TIME)

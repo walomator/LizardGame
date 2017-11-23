@@ -26,5 +26,9 @@ func remove(action):
 #		print("Removed action: ", action)
 	
 
+func clear():
+	active_actions = []
+	
+
 func get_actions():
 	return active_actions
