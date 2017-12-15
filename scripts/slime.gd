@@ -3,6 +3,7 @@ extends "monster.gd"
 
 const BOUNCINESS = 200
 const MAX_HEALTH = 2
+const DAMAGE     = 1
 const FLICKER_INTERVAL = 0.01
 const PLAY_DEAD_TIME = 0.4
 

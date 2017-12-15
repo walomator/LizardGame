@@ -7,13 +7,13 @@ onready var sound_node = get_node("Sound")
 var idle_anim_node
 var collision_box_node
 var health = 1
+const DAMAGE = 1
 
 const BOUNCINESS = 100
 
 const SimpleTimer = preload("res://scripts/simple_timer.gd")
 
 func _ready():
-	print("In ready of monster.gd")
 	set_fixed_process(true)
 	
 	self.connect("body_collided", collision_handler_node, "handle_body_collided")
@@ -31,6 +31,10 @@ func _fixed_process(delta):
 
 func get_health():
 	return health
+	
+
+func get_damage():
+	return DAMAGE
 	
 
 func get_bounciness():

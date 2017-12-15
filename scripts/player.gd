@@ -105,7 +105,6 @@ func _ready():
 
 func _fixed_process(delta):
 	# Increase velocity due to gravity and other forces
-	print(direction)
 	velocity.x = RUN_SPEED * direction + force_x
 	velocity.y += GRAVITY * delta + force_y # v(t) = G*t + C
 	
@@ -337,4 +336,7 @@ func handle_player_hit_enemy_top(player, enemy):
 
 func handle_player_hit_enemy_side(player, enemy, normal):
 	reel(HURT_FORCE, normal)
+	var damage = enemy.get_damage()
+	set_health(get_health() - damage)
+	print(health)
 	start_timer("unstun", STUN_TIME)
