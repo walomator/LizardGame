@@ -1,6 +1,9 @@
 extends "character.gd"
 
-#onready var sound_node = get_node("Sound")
+# Hazards have collision and deal damage
+# Hazards inherit from characters
+# Traps do not have collision and can trigger events
+
 var sprite_node
 var damage = 1
 
