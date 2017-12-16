@@ -5,10 +5,9 @@ signal body_collided
 onready var collision_handler_node = get_node("/root/World/CollisionHandler")
 onready var sound_node = get_node("Sound") 
 var idle_anim_node
-var collision_box_node
-const DAMAGE = 1
 
-const BOUNCINESS = 100
+var bounciness = 100
+var damage     = 1
 
 const SimpleTimer = preload("res://scripts/simple_timer.gd")
 
@@ -28,12 +27,20 @@ func _fixed_process(delta):
 			emit_signal("body_collided", self, get_collider(), get_collision_normal())
 	
 
-func get_damage():
-	return DAMAGE
+func _set_bounciness(new_bounciness):
+	bounciness = new_bounciness
+	
+
+func _set_damage(new_damage):
+	damage = new_damage
 	
 
 func get_bounciness():
-	return BOUNCINESS
+	return bounciness
+	
+
+func get_damage():
+	return damage
 	
 
 func start_timer(name, time):
@@ -46,7 +53,7 @@ func handle_timeout():
 	
 
 func handle_player_hit_enemy_top(player, enemy):
-	set_health(get_health() - 1) # FEAT - Should be dependent on player's damage
+	_set_health(get_health() - 1) # FEAT - Should be dependent on player's damage
 	
 
 func handle_player_hit_enemy_side(player, enemy, normal):

@@ -72,7 +72,7 @@ var action
 var name = "Protagonist"
 
 func _ready():
-	set_health(MAX_HEALTH)
+	_set_health(MAX_HEALTH)
 	
 	set_fixed_process(true)
 	set_process_input(true)
@@ -337,6 +337,5 @@ func handle_player_hit_enemy_top(player, enemy):
 func handle_player_hit_enemy_side(player, enemy, normal):
 	reel(HURT_FORCE, normal)
 	var damage = enemy.get_damage()
-	set_health(get_health() - damage)
-	print(health)
+	_set_health(get_health() - damage)
 	start_timer("unstun", STUN_TIME)

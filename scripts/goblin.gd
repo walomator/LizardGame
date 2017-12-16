@@ -1,15 +1,15 @@
 extends "monster.gd"
 # parent class has _fixed_process
 
-const BOUNCINESS = 150
-const MAX_HEALTH = 3
-const DAMAGE     = 1
 const FLICKER_INTERVAL = 0.01
 const PLAY_DEAD_TIME = 0.4
 
 
 func _ready():
-	set_health(MAX_HEALTH)
+	_set_bounciness(150)
+	_set_health    (3)
+	_set_damage    (1)
+	
 	set_fixed_process(true)
 	
 	self.connect("body_collided", collision_handler_node, "handle_body_collided")
