@@ -1,5 +1,6 @@
 extends KinematicBody2D
 
+# Perhaps particles should inherit from a high level class
 var spawner
 var direction = 0
 

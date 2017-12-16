@@ -5,6 +5,8 @@ extends Node2D
 
 signal player_hit_enemy_top
 signal player_hit_enemy_side
+signal player_hit_trap_top
+signal player_hit_trap_side
 
 onready var SimpleTimer = load("res://scripts/simple_timer.gd")
 
@@ -32,6 +34,7 @@ func handle_body_collided(detecting, colliding, normal):
 	var is_detecting_enemy = detecting.is_in_group("Enemies")
 	var is_colliding_player = colliding.is_in_group("Players")
 	var is_colliding_enemy = colliding.is_in_group("Enemies")
+	var is_colliding_trap = colliding.is_in_group("Traps")
 	
 	if (is_detecting_player and is_colliding_enemy) or (is_detecting_enemy and is_colliding_player):
 		_handle_player_enemy_collided(detecting, colliding, normal)
@@ -39,12 +42,14 @@ func handle_body_collided(detecting, colliding, normal):
 		pass
 	elif is_detecting_player and is_colliding_player:
 		pass
+	elif is_detecting_player and is_colliding_trap:
+		_handle_player_trap_collided(detecting, colliding, normal)
 	
 
 func _handle_player_enemy_collided(detecting, colliding, normal):
 	var player
 	var enemy
-	if detecting.is_in_group("Players"): # FEAT - Shouldn't trust that anything not "Players" is "Enemies", though right "now" it is
+	if detecting.is_in_group("Players"):
 		player = detecting
 		enemy = colliding
 	else:
@@ -67,6 +72,13 @@ func _handle_player_enemy_collided(detecting, colliding, normal):
 	self.disconnect("player_hit_enemy_side", detecting, "handle_player_hit_enemy_side")
 	self.disconnect("player_hit_enemy_top", colliding, "handle_player_hit_enemy_top")
 	self.disconnect("player_hit_enemy_side", colliding, "handle_player_hit_enemy_side")
+	
+
+func handle_player_trap_collided(detecting, colliding, normal):
+	if normal == Vector2(0, -1): # Player landed from above
+		emit_signal("player_hit_trap_top", detecting, colliding)
+	elif normal == Vector2(1, 0) or normal == Vector2(-1, 0):
+		emit_signal("player_hit_trap_side", detecting, colliding, normal)
 	
 
 func handle_timeout(object_timer, name):

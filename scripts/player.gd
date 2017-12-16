@@ -43,6 +43,7 @@ var last_direction = 1 # The direction last moved, or the facing direction
 var start_pos_x = 128
 var start_pos_y = 128
 var move_remainder = Vector2(0, 0)
+var run_speed = 0
 var force_x = 0
 var force_y = 0
 var velocity = Vector2(0, 0)
@@ -54,13 +55,13 @@ var is_grounded = true
 var time_since_grounded = 0
 var is_stunned = false
 
-const RUN_SPEED    = 195
-const MAX_VELOCITY = 600
-const JUMP_FORCE   = 260
-const BOUNCE_FORCE = 200 # Likely to be enemy specific in the future
-const GRAVITY      = 400 # Opposes jump force
-const HURT_FORCE   = 800
-const STUN_TIME    = 0.5
+const MAX_RUN_SPEED = 195
+const MAX_VELOCITY  = 600
+const JUMP_FORCE    = 260
+const BOUNCE_FORCE  = 200 # Likely to be enemy specific in the future
+const GRAVITY       = 400 # Opposes jump force
+const HURT_FORCE    = 800
+const STUN_TIME     = 0.5
 const MAX_HEALTH = 3
 
 var jump_count = 0
@@ -98,14 +99,14 @@ func _ready():
 	root_node.call_deferred("add_child", center_box_node)
 	
 	self.connect("body_collided", collision_handler_node, "handle_body_collided")
-	self.connect("shutdown", global_node, "handle_shutdown")
+	self.connect("shutdown", global_node, "handle_shutdown") # BUG - The user loses control if the player object is gone
 	self.connect("exited_center_box", global_node, "handle_exited_center_box")
 	action = ActionHolder.new()
 	
 
 func _fixed_process(delta):
 	# Increase velocity due to gravity and other forces
-	velocity.x = RUN_SPEED * direction + force_x
+	velocity.x += force_x # BUG - There is no friction or deceleration, only jumping resets x forces
 	velocity.y += GRAVITY * delta + force_y # v(t) = G*t + C
 	
 	# Clear forces after being applied to velocity
@@ -117,7 +118,7 @@ func _fixed_process(delta):
 	velocity = velocity.normalized() * min(velocity.length(), MAX_VELOCITY)
 	
 	# Try to move initially. Move returns the remainder of movement after collision
-	move_remainder = move(velocity * delta)
+	move_remainder = move(velocity * delta + Vector2(run_speed, 0) * delta) # FEAT - Write this better, this is hacky
 
 	# If there is a collision, there will be a nonzero move_remainder and is_colliding will return true
 	if is_colliding():
@@ -173,16 +174,16 @@ func _input(event):
 			action.add("left")
 			update_direction("left")
 		if event.is_action_released("move_right"):
-			print("right released")
+#			print("right released")
 			action.remove("right")
 			update_direction()
 		if event.is_action_released("move_left"):
-			print("left released")
+#			print("left released")
 			action.remove("left")
 			update_direction()
 		
 		if event.is_action_pressed("move_up") and jump_count < max_jump_count:
-			print("jump")
+#			print("jump")
 			is_grounded = false
 			update_direction()
 			velocity = Vector2(0, 0)
@@ -241,6 +242,9 @@ func update_direction(player_direction = "update"): # Decides how to update spri
 		direction += 1
 	if "left" in action.get_actions():
 		direction -= 1
+	
+	run_speed = MAX_RUN_SPEED * direction # This makes the next line seem redundant, and it is as long as there is no speed ramp
+	run_speed = min(abs(run_speed), MAX_RUN_SPEED) * direction # FEAT - Hacky thing number 2, write this better
 	
 	if direction == 0:
 		is_moving = false
@@ -322,7 +326,7 @@ func launch_particle(particle_type):
 	
 
 func debug():
-	print(velocity)
+	force_x = 200
 	
 
 func handle_body_collided(colliding_body, collision_normal):
