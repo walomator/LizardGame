@@ -1,4 +1,4 @@
-extends KinematicBody2D
+extends "character.gd"
 
 signal body_collided
 
@@ -6,7 +6,6 @@ onready var collision_handler_node = get_node("/root/World/CollisionHandler")
 onready var sound_node = get_node("Sound") 
 var idle_anim_node
 var collision_box_node
-var health = 1
 const DAMAGE = 1
 
 const BOUNCINESS = 100
@@ -29,23 +28,12 @@ func _fixed_process(delta):
 			emit_signal("body_collided", self, get_collider(), get_collision_normal())
 	
 
-func get_health():
-	return health
-	
-
 func get_damage():
 	return DAMAGE
 	
 
 func get_bounciness():
 	return BOUNCINESS
-	
-
-func set_health(monster_health):
-	if monster_health > 0:
-		health = monster_health
-	else:
-		handle_death()
 	
 
 func start_timer(name, time):
@@ -72,7 +60,7 @@ func handle_death():
 func flash(mode):
 	pass
 	
-
-func die():
-	self.queue_free()
-	
+#
+#func die(): 
+#	self.queue_free()
+#	
