@@ -109,10 +109,6 @@ func _fixed_process(delta):
 	# Increase velocity due to gravity and other forces
 	velocity.x += force_x # BUG - There is no friction or deceleration, only jumping resets x forces
 	velocity.y += GRAVITY * delta + force_y # v(t) = G*t + C
-	if velocity.x > 0:
-		velocity.x -= DRAG * delta
-	if velocity.x < 0:
-		velocity.x += DRAG * delta
 	
 	# Clear forces after being applied to velocity
 	force_x = 0
@@ -126,20 +122,26 @@ func _fixed_process(delta):
 	move_remainder = move(velocity * delta + Vector2(run_speed, 0) * delta) # FEAT - Write this better, this is hacky
 
 	# If there is a collision, there will be a nonzero move_remainder and is_colliding will return true
-	if is_colliding(): # DEV - physics needs to apply friction as a counter to ground sliding in form of "drag"
+	if is_colliding():
 		collide_normal = get_collision_normal()
 		colliding_body = get_collider()
 		
 		# Make appropriate changes if colliding surface is horizontal
 		if collide_normal == Vector2(0, -1):
-			is_grounded = true
+			is_grounded = true # BUG - This means that only flat surfaces count as ground 
 			if time_since_grounded != 0:
 				update_direction()
 			time_since_grounded = 0
 			jump_count = 0
+			
+			var moving_direction = sign(velocity.x)
+			velocity.x -= moving_direction * DRAG * delta # Decelerate player if sliding without input
+			if moving_direction != sign(velocity.x):
+				velocity.x = 0
+		
 		else:
 			time_since_grounded += delta
-			if is_grounded and time_since_grounded > 0.00:
+			if is_grounded and time_since_grounded > 0.00: # DEV - Make this a constant and question why it is 0.00
 				update_direction()
 				is_grounded = false
 		
@@ -222,7 +224,7 @@ func flip_sprite(is_flipped):
 	fall_anim_node.set_flip_h(is_flipped)
 	
 
-func get_direction():
+func get_direction(): # DEV - This is wrong and should be deprecated
 	var player_direction
 	if direction == 1:
 		player_direction = "right"
@@ -233,7 +235,7 @@ func get_direction():
 	return player_direction
 	
 
-func get_last_direction():
+func get_last_direction(): # DEV - This is wrong and should be deprecated
 	var player_direction = "still"
 	if last_direction == 1:
 		player_direction = "right"
@@ -332,7 +334,7 @@ func launch_particle(particle_type):
 	
 
 func debug():
-	force_x = 200
+	pass
 	
 
 func handle_body_collided(colliding_body, collision_normal): # DEV - This function name is misleading
