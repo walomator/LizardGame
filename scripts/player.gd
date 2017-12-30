@@ -60,9 +60,10 @@ const MAX_VELOCITY  = 600
 const JUMP_FORCE    = 260
 const BOUNCE_FORCE  = 200 # Likely to be enemy specific in the future
 const GRAVITY       = 400 # Opposes jump force
-const HURT_FORCE    = 800
+const HURT_FORCE    = 80
 const STUN_TIME     = 0.5
-const MAX_HEALTH = 3
+const MAX_HEALTH    = 3
+const DRAG          = 300
 
 var jump_count = 0
 var max_jump_count = 2
@@ -108,6 +109,10 @@ func _fixed_process(delta):
 	# Increase velocity due to gravity and other forces
 	velocity.x += force_x # BUG - There is no friction or deceleration, only jumping resets x forces
 	velocity.y += GRAVITY * delta + force_y # v(t) = G*t + C
+	if velocity.x > 0:
+		velocity.x -= DRAG * delta
+	if velocity.x < 0:
+		velocity.x += DRAG * delta
 	
 	# Clear forces after being applied to velocity
 	force_x = 0
@@ -121,7 +126,7 @@ func _fixed_process(delta):
 	move_remainder = move(velocity * delta + Vector2(run_speed, 0) * delta) # FEAT - Write this better, this is hacky
 
 	# If there is a collision, there will be a nonzero move_remainder and is_colliding will return true
-	if is_colliding():
+	if is_colliding(): # DEV - physics needs to apply friction as a counter to ground sliding in form of "drag"
 		collide_normal = get_collision_normal()
 		colliding_body = get_collider()
 		
