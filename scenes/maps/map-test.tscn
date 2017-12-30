@@ -83,9 +83,7 @@ transform/pos = Vector2( 1856, 656 )
 
 transform/pos = Vector2( 669, 128 )
 
-[node name="Spike" parent="." groups=[
-"Traps",
-] instance=ExtResource( 6 )]
+[node name="Spike" parent="." instance=ExtResource( 6 )]
 
 transform/pos = Vector2( 517, 148 )
 

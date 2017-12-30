@@ -8,7 +8,9 @@
 custom_solver_bias = 0.0
 extents = Vector2( 9, 11 )
 
-[node name="Spike" type="KinematicBody2D"]
+[node name="Spike" type="KinematicBody2D" groups=[
+"Hazards",
+]]
 
 input/pickable = false
 shapes/0/shape = SubResource( 1 )

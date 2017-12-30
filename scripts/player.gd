@@ -144,7 +144,7 @@ func _fixed_process(delta):
 		# Prevent incorrect acceleration due to gravity on surfaces 
 		velocity.y = collide_normal.slide(Vector2(0, velocity.y)).y
 		
-		if colliding_body.is_in_group("Enemies"): # FEAT - Should be "Collidables"
+		if colliding_body.is_in_group("Enemies") or colliding_body.is_in_group("Hazards"): # FEAT - Should be "Collidables"
 			handle_body_collided(colliding_body, collide_normal)
 	else:
 		time_since_grounded += delta
@@ -160,48 +160,49 @@ func _input(event):
 	if event.is_action_pressed("shutdown"):
 		emit_signal("shutdown")
 	
-	if is_stunned == false:
-		if direction:
-			last_direction = direction
-		
-		# Input
-		if event.is_action_pressed("move_right"):
-	#		print("right")
-			action.add("right")
-			update_direction("right")
-		if event.is_action_pressed("move_left"):
-	#		print("left")
-			action.add("left")
-			update_direction("left")
-		if event.is_action_released("move_right"):
+	if is_stunned == true:
+		return
+	
+	if direction:
+		last_direction = direction
+	
+	# Input
+	if event.is_action_pressed("move_right"):
+#		print("right")
+		action.add("right")
+		update_direction("right")
+	if event.is_action_pressed("move_left"):
+#		print("left")
+		action.add("left")
+		update_direction("left")
+	if event.is_action_released("move_right"):
 #			print("right released")
-			action.remove("right")
-			update_direction()
-		if event.is_action_released("move_left"):
+		action.remove("right")
+		update_direction()
+	if event.is_action_released("move_left"):
 #			print("left released")
-			action.remove("left")
-			update_direction()
-		
-		if event.is_action_pressed("move_up") and jump_count < max_jump_count:
+		action.remove("left")
+		update_direction()
+	
+	if event.is_action_pressed("move_up") and jump_count < max_jump_count:
 #			print("jump")
-			is_grounded = false
-			update_direction()
-			velocity = Vector2(0, 0)
-			force_y = -JUMP_FORCE
-			jump_count += 1
-			# FEAT - Variable jump length needed
-		
-		if event.is_action_pressed("reset"):
-	#		print("reset")
-			reset_position()
-		
-		if event.is_action_pressed("combat_action_1"):
-	#		print("fireball")
-			launch_particle("fireball")
-		
-		if event.is_action_pressed("debug"):
-			debug()
-	# End if is_stunned == false
+		is_grounded = false
+		update_direction()
+		velocity = Vector2(0, 0)
+		force_y = -JUMP_FORCE
+		jump_count += 1
+		# FEAT - Variable jump length needed
+	
+	if event.is_action_pressed("reset"):
+#		print("reset")
+		reset_position()
+	
+	if event.is_action_pressed("combat_action_1"):
+#		print("fireball")
+		launch_particle("fireball")
+	
+	if event.is_action_pressed("debug"):
+		debug()
 	
 
 func handle_timeout(object_timer, name): # Called by timer after it times out
@@ -329,7 +330,7 @@ func debug():
 	force_x = 200
 	
 
-func handle_body_collided(colliding_body, collision_normal):
+func handle_body_collided(colliding_body, collision_normal): # DEV - This function name is misleading
 	emit_signal("body_collided", self, colliding_body, collision_normal)
 	
 
@@ -343,3 +344,8 @@ func handle_player_hit_enemy_side(player, enemy, normal):
 	var damage = enemy.get_damage()
 	_set_health(get_health() - damage)
 	start_timer("unstun", STUN_TIME)
+	
+func handle_player_hit_hazard_top(player, hazard, normal):
+	var damage = hazard.get_damage()
+	_set_health(get_health() - damage)
+	
