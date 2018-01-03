@@ -55,15 +55,16 @@ var is_grounded = true
 var time_since_grounded = 0
 var is_stunned = false
 
-const MAX_RUN_SPEED = 195
-const MAX_VELOCITY  = 600
-const JUMP_FORCE    = 260
-const BOUNCE_FORCE  = 200 # Likely to be enemy specific in the future
-const GRAVITY       = 400 # Opposes jump force
-const HURT_FORCE    = 80
-const STUN_TIME     = 0.5
-const MAX_HEALTH    = 3
-const DRAG          = 300
+const MAX_RUN_SPEED    = 195
+const MAX_VELOCITY     = 400
+const JUMP_FORCE       = 260
+const BOUNCE_FORCE     = 200 # Likely to be enemy specific in the future
+const GRAVITY          = 400 # Opposes jump force
+const HURT_FORCE       = 80
+const STUN_TIME        = 0.5
+const MAX_HEALTH       = 3
+const DRAG             = 300
+const AIR_ACCELERATION = 4
 
 var jump_count = 0
 var max_jump_count = 2
@@ -107,19 +108,21 @@ func _ready():
 
 func _fixed_process(delta):
 	# Increase velocity due to gravity and other forces
-	velocity.x += force_x # BUG - There is no friction or deceleration, only jumping resets x forces
-	velocity.y += GRAVITY * delta + force_y # v(t) = G*t + C
+	velocity.x += force_x
+	velocity.y += GRAVITY * delta + force_y
 	
 	# Clear forces after being applied to velocity
 	force_x = 0
 	force_y = 0
 	
-	# Maximize speed a character can be moved by forces
-	# BUG - This does not limit true speed, just speed for variable delta
-	velocity = velocity.normalized() * min(velocity.length(), MAX_VELOCITY)
+	# Set maximum speed a player can be moved by forces
+	velocity = velocity.normalized() * min(velocity.length(), MAX_VELOCITY) 
 	
-	# Try to move initially. Move returns the remainder of movement after collision
-	move_remainder = move(velocity * delta + Vector2(run_speed, 0) * delta) # FEAT - Write this better, this is hacky
+	# Set additional velocity caused by player input
+	var controller_velocity = Vector2(run_speed, 0)
+	
+	# Try to move initially. Return the remainder of movement after collision
+	move_remainder = move((velocity + controller_velocity) * delta)
 
 	# If there is a collision, there will be a nonzero move_remainder and is_colliding will return true
 	if is_colliding():
@@ -141,7 +144,7 @@ func _fixed_process(delta):
 		
 		else:
 			time_since_grounded += delta
-			if is_grounded and time_since_grounded > 0.00: # DEV - Make this a constant and question why it is 0.00
+			if is_grounded and time_since_grounded > 0:
 				update_direction()
 				is_grounded = false
 		
@@ -195,7 +198,7 @@ func _input(event):
 #			print("jump")
 		is_grounded = false
 		update_direction()
-		velocity = Vector2(0, 0)
+		reset_velocity()
 		force_y = -JUMP_FORCE
 		jump_count += 1
 		# FEAT - Variable jump length needed
@@ -218,30 +221,14 @@ func handle_timeout(object_timer, name): # Called by timer after it times out
 	object_timer.queue_free()
 	
 
+func reset_velocity():
+	velocity = Vector2(0, 0)
+	
+
 func flip_sprite(is_flipped):
 	idle_sprite_node.set_flip_h(is_flipped)
 	move_anim_node.set_flip_h(is_flipped)
 	fall_anim_node.set_flip_h(is_flipped)
-	
-
-func get_direction(): # DEV - This is wrong and should be deprecated
-	var player_direction
-	if direction == 1:
-		player_direction = "right"
-	elif direction == -1:
-		player_direction = "left"
-	elif direction == 0:
-		player_direction = "still"
-	return player_direction
-	
-
-func get_last_direction(): # DEV - This is wrong and should be deprecated
-	var player_direction = "still"
-	if last_direction == 1:
-		player_direction = "right"
-	elif last_direction == -1:
-		player_direction = "left"
-	return player_direction
 	
 
 func update_direction(player_direction = "update"): # Decides how to update sprite
@@ -301,7 +288,7 @@ func switch_mode(character_mode): # Updates sprite
 func bounce(bounce_force): # Should be called externally
 	is_grounded = false
 	update_direction()
-	velocity = Vector2(0, 0)
+	reset_velocity()
 	force_y = -bounce_force
 	jump_count = 1
 	
@@ -310,7 +297,7 @@ func reel(reel_force, normal):
 	is_stunned = true
 #	is_grounded = false
 #	update_direction()
-	velocity = Vector2(0, 0)
+	reset_velocity()
 	force_x = normal.x * reel_force
 #	jump_count = 1
 	direction = 0
@@ -321,7 +308,7 @@ func reel(reel_force, normal):
 
 func reset_position():
 	self.set_pos(Vector2(start_pos_x, start_pos_y))
-	velocity = Vector2(0, 0)
+	reset_velocity()
 	
 
 func launch_particle(particle_type):

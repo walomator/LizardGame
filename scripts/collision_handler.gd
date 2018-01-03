@@ -41,7 +41,6 @@ func handle_body_collided(detecting, colliding, normal):
 	elif is_detecting_player and is_colliding_player:
 		pass
 	elif is_detecting_player and is_colliding_hazard:
-		print("Goteem")
 		_handle_player_hazard_collided(detecting, colliding, normal)
 	
 
