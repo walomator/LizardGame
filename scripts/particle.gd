@@ -1,7 +1,7 @@
 extends KinematicBody2D
 
 # Perhaps particles should inherit from a high level class
-var spawner
+var spawner # Use node type
 var direction = 0
 
 
@@ -27,12 +27,7 @@ func _fixed_process(delta): # FEAT - Should be more dynamic
 	
 
 func set_direction(object_direction):
-	if object_direction == "right":
-		direction = 1
-	elif object_direction == "left":
-		direction = -1
-	elif object_direction == "still":
-		direction = 0
+	direction = object_direction
 	
 
 func set_spawner(object_spawner):

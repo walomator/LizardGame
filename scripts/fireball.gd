@@ -22,4 +22,4 @@ func handle_timeout(timer_object, name):
 	elif name == "TIME_TO_DIE":
 		die()
 	
-	timer_object.queue_free()
+	timer_object.queue_free() # DEV - Is this necessary?

@@ -22,6 +22,7 @@ extends "character.gd"
 var debug = false
 
 var fireball_scene = preload("res://scenes/effects/Fireball.tscn")
+var hookshot_scene = preload("res://scenes/effects/Hookshot.tscn")
 
 var idle_sprite_node # Safe to initialize in the _ready() function
 var move_anim_node
@@ -209,7 +210,7 @@ func _input(event):
 	
 	if event.is_action_pressed("combat_action_1"):
 #		print("fireball")
-		launch_particle("fireball")
+		launch_particle("hookshot")
 	
 	if event.is_action_pressed("debug"):
 		debug()
@@ -312,16 +313,23 @@ func reset_position():
 	
 
 func launch_particle(particle_type):
+	var particle = "null"
+	
 	if particle_type == "fireball":
-		var particle = fireball_scene.instance()
-		get_tree().get_root().add_child(particle)
-		particle.set_direction(self.get_last_direction())
-		particle.set_spawner("Protagonist")
-		particle.set_pos(self.get_pos()) # BUG - Not centered
+		particle = fireball_scene.instance()
+
+	if particle_type == "hookshot":
+		particle = hookshot_scene.instance()
+	
+	# DEV - This code limits usage of the launch_particle function
+	get_tree().get_root().add_child(particle)
+	particle.set_direction(last_direction)
+	particle.set_spawner(self)
+	particle.set_global_pos(self.get_pos()) # BUG - Not centered
 	
 
 func debug():
-	pass
+	print("Is it me I'm looking for?")
 	
 
 func handle_body_collided(colliding_body, collision_normal): # DEV - This function name is misleading
