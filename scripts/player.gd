@@ -64,7 +64,7 @@ const GRAVITY          = 400 # Opposes jump force
 const HURT_FORCE       = 80
 const STUN_TIME        = 0.5
 const MAX_HEALTH       = 3
-const DRAG             = 300
+const GROUND_DRAG      = 300
 const AIR_ACCELERATION = 4
 
 var jump_count = 0
@@ -77,6 +77,7 @@ var name = "Protagonist"
 
 func _ready():
 	_set_health(MAX_HEALTH)
+	_set_is_weighted(true)
 	
 	set_fixed_process(true)
 	set_process_input(true)
@@ -124,7 +125,9 @@ func _fixed_process(delta):
 	
 	# Try to move initially. Return the remainder of movement after collision
 	move_remainder = move((velocity + controller_velocity) * delta)
-
+	
+#	increase_velocity(Vector2(force_x, force_y))
+	
 	# If there is a collision, there will be a nonzero move_remainder and is_colliding will return true
 	if is_colliding():
 		collide_normal = get_collision_normal()
@@ -139,7 +142,7 @@ func _fixed_process(delta):
 			jump_count = 0
 			
 			var moving_direction = sign(velocity.x)
-			velocity.x -= moving_direction * DRAG * delta # Decelerate player if sliding without input
+			velocity.x -= moving_direction * GROUND_DRAG * delta # Decelerate player if sliding without input
 			if moving_direction != sign(velocity.x):
 				velocity.x = 0
 		

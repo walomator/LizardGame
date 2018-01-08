@@ -1,4 +1,4 @@
-extends KinematicBody2D
+extends "character.gd"
 
 # Times overlap
 const START_VELOCITY = 0
