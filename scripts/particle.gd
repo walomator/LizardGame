@@ -1,15 +1,15 @@
 extends KinematicBody2D
 
-# Perhaps particles should inherit from a high level class
-var spawner # Use node type
-var direction = 0
-
-
 # Times overlap
 const START_VELOCITY = 0
 const TIME_TO_START_FLICKER = 0
 const FLICKER_INTERVAL = 0
 const TIME_TO_DIE = 0
+
+# Perhaps particles should inherit from a high level class
+var spawner # Use node type
+var direction = 0
+var velocity = 0
 
 onready var sprite_node = self.get_node("Sprite")
 
@@ -23,7 +23,11 @@ func _ready():
 
 func _fixed_process(delta): # FEAT - Should be more dynamic
 	if direction:
-		move(Vector2(direction * START_VELOCITY * delta, 0))
+		move(Vector2(direction * velocity * delta, 0))
+	
+
+func set_velocity(particle_velocity):
+	velocity = particle_velocity
 	
 
 func set_direction(object_direction):

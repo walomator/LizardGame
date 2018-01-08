@@ -6,8 +6,8 @@ const TIME_TO_START_FLICKER = 1
 const FLICKER_INTERVAL = 0.05
 const TIME_TO_DIE = 1.4
 
-
 func _ready():
+	set_velocity(START_VELOCITY)
 	set_fixed_process(true)
 	start_timer("TIME_TO_START_FLICKER", TIME_TO_START_FLICKER)
 	start_timer("TIME_TO_DIE", TIME_TO_DIE)
