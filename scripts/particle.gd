@@ -1,6 +1,7 @@
 extends "character.gd"
 
-# Times overlap
+
+# Times overlap - ie fireball despawns 4 seconds after creation
 const START_VELOCITY = 0
 const TIME_TO_START_FLICKER = 0
 const FLICKER_INTERVAL = 0
@@ -9,7 +10,6 @@ const TIME_TO_DIE = 0
 # Perhaps particles should inherit from a high level class
 var spawner # Use node type
 var direction = 0
-var velocity = 0
 
 onready var sprite_node = self.get_node("Sprite")
 
@@ -27,7 +27,7 @@ func _fixed_process(delta): # FEAT - Should be more dynamic
 	
 
 func set_velocity(particle_velocity):
-	velocity = particle_velocity
+	velocity = Vector2(particle_velocity, 0)
 	
 
 func set_direction(object_direction):

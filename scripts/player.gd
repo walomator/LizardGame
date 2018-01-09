@@ -43,13 +43,9 @@ var direction = 0 # 0 = stationary, 1 = right, -1 = left
 var last_direction = 1 # The direction last moved, or the facing direction
 var start_pos_x = 128
 var start_pos_y = 128
-var move_remainder = Vector2(0, 0)
 var run_speed = 0
 var force_x = 0
 var force_y = 0
-var velocity = Vector2(0, 0)
-var collide_normal
-var colliding_body
 var is_moving = false # Running implies specifically FAST running, to be considered if there will be multiple speeds
 var movement_mode = "idle"
 var is_grounded = true
@@ -57,10 +53,10 @@ var time_since_grounded = 0
 var is_stunned = false
 
 const MAX_RUN_SPEED    = 195
-const MAX_VELOCITY     = 400
+const MAX_VELOCITY     = 400 # DEV - note: adjustment to MAX_VELOCITY of character.gd class
 const JUMP_FORCE       = 260
 const BOUNCE_FORCE     = 200 # Likely to be enemy specific in the future
-const GRAVITY          = 400 # Opposes jump force
+#const GRAVITY          = 400 # Opposes jump force
 const HURT_FORCE       = 80
 const STUN_TIME        = 0.5
 const MAX_HEALTH       = 3
@@ -109,29 +105,12 @@ func _ready():
 	
 
 func _fixed_process(delta):
-	# Increase velocity due to gravity and other forces
-	velocity.x += force_x
-	velocity.y += GRAVITY * delta + force_y
-	
-	# Clear forces after being applied to velocity
-	force_x = 0
-	force_y = 0
-	
-	# Set maximum speed a player can be moved by forces
-	velocity = velocity.normalized() * min(velocity.length(), MAX_VELOCITY) 
-	
-	# Set additional velocity caused by player input
-	var controller_velocity = Vector2(run_speed, 0)
-	
-	# Try to move initially. Return the remainder of movement after collision
-	move_remainder = move((velocity + controller_velocity) * delta)
-	
-#	increase_velocity(Vector2(force_x, force_y))
+	print("pong")
 	
 	# If there is a collision, there will be a nonzero move_remainder and is_colliding will return true
 	if is_colliding():
-		collide_normal = get_collision_normal()
-		colliding_body = get_collider()
+		var collide_normal = get_collision_normal()
+		var colliding_body = get_collider()
 		
 		# Make appropriate changes if colliding surface is horizontal
 		if collide_normal == Vector2(0, -1):
@@ -152,12 +131,6 @@ func _fixed_process(delta):
 				update_direction()
 				is_grounded = false
 		
-		move_remainder = collide_normal.slide(move_remainder)
-		move(move_remainder)
-		
-		# Prevent incorrect acceleration due to gravity on surfaces 
-		velocity.y = collide_normal.slide(Vector2(0, velocity.y)).y
-		
 		if colliding_body.is_in_group("Enemies") or colliding_body.is_in_group("Hazards"): # FEAT - Should be "Collidables"
 			handle_body_collided(colliding_body, collide_normal)
 	else:
@@ -169,6 +142,8 @@ func _fixed_process(delta):
 			jump_count = 1
 	# End if is_colliding():else
 	
+	# Set additional velocity caused by player input
+	increase_velocity(Vector2(run_speed, 0))
 
 func _input(event):
 	if event.is_action_pressed("shutdown"):

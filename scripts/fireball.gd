@@ -1,6 +1,6 @@
 extends "particle.gd"
 
-# Times overlap - ie fireball despawns 4 seconds after creation
+
 const START_VELOCITY = 200
 const TIME_TO_START_FLICKER = 1
 const FLICKER_INTERVAL = 0.05
