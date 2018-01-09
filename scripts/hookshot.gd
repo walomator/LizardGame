@@ -1,13 +1,11 @@
 extends "particle.gd"
 
+
 signal body_collided
 
-var START_VELOCITY = 100
-const TIME_TO_START_FLICKER = 0
-const FLICKER_INTERVAL = 0.05
-const TIME_TO_DIE = 0
+const START_VELOCITY = 100
 
-onready var is_pulling = false
+var is_pulling = false
 var path_to_zone_node = "Area2D/"
 
 
