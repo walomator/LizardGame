@@ -105,7 +105,9 @@ func _ready():
 	
 
 func _fixed_process(delta):
-	print("pong")
+	increase_velocity(Vector2(force_x, force_y))
+	force_x = 0
+	force_y = 0
 	
 	# If there is a collision, there will be a nonzero move_remainder and is_colliding will return true
 	if is_colliding():
@@ -157,19 +159,15 @@ func _input(event):
 	
 	# Input
 	if event.is_action_pressed("move_right"):
-#		print("right")
 		action.add("right")
-		update_direction("right")
+		update_direction()
 	if event.is_action_pressed("move_left"):
-#		print("left")
 		action.add("left")
-		update_direction("left")
+		update_direction()
 	if event.is_action_released("move_right"):
-#			print("right released")
 		action.remove("right")
 		update_direction()
 	if event.is_action_released("move_left"):
-#			print("left released")
 		action.remove("left")
 		update_direction()
 	
@@ -210,7 +208,7 @@ func flip_sprite(is_flipped):
 	fall_anim_node.set_flip_h(is_flipped)
 	
 
-func update_direction(player_direction = "update"): # Decides how to update sprite
+func update_direction(): # Decides how to update sprite
 	direction = 0
 	if "right" in action.get_actions():
 		direction += 1
@@ -219,6 +217,7 @@ func update_direction(player_direction = "update"): # Decides how to update spri
 	
 	run_speed = MAX_RUN_SPEED * direction # This makes the next line seem redundant, and it is as long as there is no speed ramp
 	run_speed = min(abs(run_speed), MAX_RUN_SPEED) * direction # FEAT - Hacky thing number 2, write this better
+	print(run_speed)
 	
 	if direction == 0:
 		is_moving = false
@@ -283,7 +282,6 @@ func reel(reel_force, normal):
 	action.clear()
 	update_direction()
 	switch_mode("stunned")
-#	print("Reeling!")
 
 func reset_position():
 	self.set_pos(Vector2(start_pos_x, start_pos_y))
