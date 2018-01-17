@@ -23,7 +23,7 @@ func _ready():
 
 func _fixed_process(delta): # FEAT - Should be more dynamic
 	if direction:
-		move(Vector2(direction * velocity * delta, 0))
+		move(Vector2(direction * velocity.x * delta, 0))
 	
 
 func set_velocity(particle_velocity):
