@@ -109,10 +109,9 @@ func _fixed_process(delta):
 	force_x = 0
 	force_y = 0
 	
-	# If there is a collision, there will be a nonzero move_remainder and is_colliding will return true
-	if is_colliding():
-		var collide_normal = get_collision_normal()
-		var colliding_body = get_collider()
+	if char_colliding():
+		var collide_normal = get_char_collision_normal()
+		var colliding_body = get_char_collider()
 		
 		# Make appropriate changes if colliding surface is horizontal
 		if collide_normal == Vector2(0, -1):
@@ -145,7 +144,8 @@ func _fixed_process(delta):
 	# End if is_colliding():else
 	
 	# Set additional velocity caused by player input
-	increase_velocity(Vector2(run_speed, 0))
+	set_controller_velocity(Vector2(run_speed, 0))
+	
 
 func _input(event):
 	if event.is_action_pressed("shutdown"):
@@ -217,7 +217,6 @@ func update_direction(): # Decides how to update sprite
 	
 	run_speed = MAX_RUN_SPEED * direction # This makes the next line seem redundant, and it is as long as there is no speed ramp
 	run_speed = min(abs(run_speed), MAX_RUN_SPEED) * direction # FEAT - Hacky thing number 2, write this better
-	print(run_speed)
 	
 	if direction == 0:
 		is_moving = false
