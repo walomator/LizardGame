@@ -7,17 +7,13 @@ extends "character.gd"
 #	Sprites for protagonist's running animation don't align with idle
 #	Fix: edit animation frames
 
-# Sticky Walls and Floors
-#	Replicable: y
-#	Pressing against walls while falling slows a player
-
-# Believe in Yourself Bug
-#	Replicable: y
-#	Running off a ledge makes the run animation continue to play
-
 # Floating Bug
 #	Replicable: y
 #	Pressing against a monster repeatedly may cause the air animation to play
+
+# Floating Bug 2
+#	Replicable: y
+#	Pressig against a wall will cause the air animation to switch on and off
 
 var debug = false
 
@@ -128,17 +124,17 @@ func _fixed_process(delta):
 		
 		else:
 			time_since_grounded += delta
-			if is_grounded and time_since_grounded > 0:
-				update_direction()
+			if is_grounded and time_since_grounded > delta: # BUG - Causes air animation to play when pressing on wall
 				is_grounded = false
+				update_direction()
 		
 		if colliding_body.is_in_group("Enemies") or colliding_body.is_in_group("Hazards"): # FEAT - Should be "Collidables"
 			handle_body_collided(colliding_body, collide_normal)
 	else:
 		time_since_grounded += delta
-		if is_grounded and time_since_grounded > 0.00:
-			update_direction()
+		if is_grounded and time_since_grounded > delta: # BUG - Causes air animation to play when pressing on wall
 			is_grounded = false
+			update_direction()
 		if jump_count == 0: # If player fell off a ledge
 			jump_count = 1
 	# End if is_colliding():else
@@ -258,8 +254,6 @@ func switch_mode(character_mode): # Updates sprite
 		fall_anim_node.set_hidden(false)
 	elif character_mode == "stunned":
 		pass
-	if debug == true:
-		print("character_mode: " + str(character_mode))
 	
 
 func bounce(bounce_force): # Should be called externally
@@ -322,7 +316,11 @@ func handle_player_hit_enemy_side(player, enemy, normal):
 	_set_health(get_health() - damage)
 	start_timer("unstun", STUN_TIME)
 	
+
 func handle_player_hit_hazard_top(player, hazard, normal):
 	var damage = hazard.get_damage()
 	_set_health(get_health() - damage)
 	
+
+func handle_player_hit_hazard_side(player, hazard, normal):
+	pass # DEV - It should be in the code of the hazard whether sides hurt the player
