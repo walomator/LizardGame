@@ -15,3 +15,4 @@ func _ready():
 #	current_map.set_script(map_loader_script)
 	self.add_child(current_map) # The ordering of the nodes is important, and will cause errors
 	current_map.set_draw_behind_parent(true)
+	

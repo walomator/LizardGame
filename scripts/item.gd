@@ -31,3 +31,4 @@ func handle_looting(entered_body):
 func handle_flag_passing(entered_body):
 	if self.is_in_group("EndLevel"):
 		emit_signal("passed_end_level")
+	

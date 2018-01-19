@@ -70,6 +70,10 @@ func increase_velocity(velocity_increase):
 	velocity += velocity_increase
 	
 
+func reset_velocity():
+	velocity = Vector2(0, 0)
+	
+
 func set_controller_velocity(char_controller_velocity):
 	controller_velocity = char_controller_velocity
 	

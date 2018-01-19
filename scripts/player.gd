@@ -47,6 +47,7 @@ var movement_mode = "idle"
 var is_grounded = true
 var time_since_grounded = 0
 var is_stunned = false
+var item_1 = "hookshot"
 
 const MAX_RUN_SPEED    = 195
 const MAX_VELOCITY     = 400 # DEV - note: adjustment to MAX_VELOCITY of character.gd class
@@ -101,9 +102,7 @@ func _ready():
 	
 
 func _fixed_process(delta):
-	increase_velocity(Vector2(force_x, force_y))
-	force_x = 0
-	force_y = 0
+	var update_delay = delta * 2
 	
 	if char_colliding():
 		var collide_normal = get_char_collision_normal()
@@ -111,8 +110,8 @@ func _fixed_process(delta):
 		
 		# Make appropriate changes if colliding surface is horizontal
 		if collide_normal == Vector2(0, -1):
-			is_grounded = true # BUG - This means that only flat surfaces count as ground 
-			if time_since_grounded != 0:
+			if time_since_grounded > update_delay:
+				is_grounded = true # BUG - This means that only flat surfaces count as ground 
 				update_direction()
 			time_since_grounded = 0
 			jump_count = 0
@@ -124,7 +123,7 @@ func _fixed_process(delta):
 		
 		else:
 			time_since_grounded += delta
-			if is_grounded and time_since_grounded > delta: # BUG - Causes air animation to play when pressing on wall
+			if is_grounded and time_since_grounded > update_delay: # BUG - Causes air animation to play when pressing on wall
 				is_grounded = false
 				update_direction()
 		
@@ -132,9 +131,9 @@ func _fixed_process(delta):
 			handle_body_collided(colliding_body, collide_normal)
 	else:
 		time_since_grounded += delta
-		if is_grounded and time_since_grounded > delta: # BUG - Causes air animation to play when pressing on wall
-			is_grounded = false
+		if is_grounded and time_since_grounded > update_delay: # BUG - Causes air animation to play when pressing on wall
 			update_direction()
+			is_grounded = false
 		if jump_count == 0: # If player fell off a ledge
 			jump_count = 1
 	# End if is_colliding():else
@@ -148,7 +147,7 @@ func _input(event):
 		emit_signal("shutdown")
 	
 	if is_stunned == true:
-		return
+		return # BUG - This should not disable ALL input
 	
 	if direction:
 		last_direction = direction
@@ -168,13 +167,7 @@ func _input(event):
 		update_direction()
 	
 	if event.is_action_pressed("move_up") and jump_count < max_jump_count:
-#			print("jump")
-		is_grounded = false
-		update_direction()
-		reset_velocity()
-		force_y = -JUMP_FORCE
-		jump_count += 1
-		# FEAT - Variable jump length needed
+		jump()
 	
 	if event.is_action_pressed("reset"):
 #		print("reset")
@@ -182,7 +175,7 @@ func _input(event):
 	
 	if event.is_action_pressed("combat_action_1"):
 #		print("fireball")
-		launch_particle("hookshot")
+		launch_particle(item_1)
 	
 	if event.is_action_pressed("debug"):
 		debug()
@@ -192,10 +185,6 @@ func handle_timeout(object_timer, name): # Called by timer after it times out
 	if name == "unstun":
 		is_stunned = false
 	object_timer.queue_free()
-	
-
-func reset_velocity():
-	velocity = Vector2(0, 0)
 	
 
 func flip_sprite(is_flipped):
@@ -235,6 +224,7 @@ func update_direction(): # Decides how to update sprite
 
 func switch_mode(character_mode): # Updates sprite
 	if character_mode == "still":
+#		print("grounded")
 		move_anim_node.stop()
 		fall_anim_node.stop()
 		idle_sprite_node.set_hidden(false)
@@ -247,6 +237,7 @@ func switch_mode(character_mode): # Updates sprite
 		move_anim_node.set_hidden(false)
 		fall_anim_node.set_hidden(true)
 	elif character_mode == "air":
+#		print("airborn")
 		move_anim_node.stop()
 		fall_anim_node.play()
 		idle_sprite_node.set_hidden(true)
@@ -260,7 +251,8 @@ func bounce(bounce_force): # Should be called externally
 	is_grounded = false
 	update_direction()
 	reset_velocity()
-	force_y = -bounce_force
+#	force_y = -bounce_force
+	increase_velocity(Vector2(0, -bounce_force))
 	jump_count = 1
 	
 
@@ -269,24 +261,35 @@ func reel(reel_force, normal):
 #	is_grounded = false
 #	update_direction()
 	reset_velocity()
-	force_x = normal.x * reel_force
+#	force_x = normal.x * reel_force
+	increase_velocity(Vector2(normal.x * reel_force, 0))
 #	jump_count = 1
 	direction = 0
 	action.clear()
 	update_direction()
 	switch_mode("stunned")
+	
 
 func reset_position():
 	self.set_pos(Vector2(start_pos_x, start_pos_y))
 	reset_velocity()
 	
 
+func jump():
+#	print("jump")
+	print(collide_normal)
+	is_grounded = false
+	update_direction()
+	reset_velocity()
+	increase_velocity(Vector2(0, -JUMP_FORCE))
+	jump_count += 1
+	# FEAT - Variable jump length needed
+	
+
 func launch_particle(particle_type):
 	var particle = "null"
-	
 	if particle_type == "fireball":
 		particle = fireball_scene.instance()
-
 	if particle_type == "hookshot":
 		particle = hookshot_scene.instance()
 	
@@ -298,7 +301,7 @@ func launch_particle(particle_type):
 	
 
 func debug():
-	print("Is it me I'm looking for?")
+	print(collide_normal)
 	
 
 func handle_body_collided(colliding_body, collision_normal): # DEV - This function name is misleading
@@ -324,3 +327,4 @@ func handle_player_hit_hazard_top(player, hazard, normal):
 
 func handle_player_hit_hazard_side(player, hazard, normal):
 	pass # DEV - It should be in the code of the hazard whether sides hurt the player
+	

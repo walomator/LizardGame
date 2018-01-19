@@ -23,3 +23,4 @@ func handle_timeout(timer_object, name):
 		die()
 	
 	timer_object.queue_free() # DEV - Is this necessary?
+	

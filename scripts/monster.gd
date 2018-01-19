@@ -67,7 +67,3 @@ func handle_death():
 func flash(mode):
 	pass
 	
-#
-#func die(): 
-#	self.queue_free()
-#	

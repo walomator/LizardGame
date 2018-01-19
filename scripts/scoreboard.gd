@@ -38,3 +38,4 @@ func handle_passed_end_level():
 func handle_obtained_potion():
 	print("The potion has been pocketed.")
 	_update_score(score + 25)
+	

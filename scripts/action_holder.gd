@@ -32,3 +32,4 @@ func clear():
 
 func get_actions():
 	return active_actions
+	

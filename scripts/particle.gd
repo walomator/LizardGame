@@ -54,3 +54,4 @@ func die():
 func handle_timeout(timer_object, name):
 	# Should be overloaded by subclass
 	timer_object.queue_free()
+	

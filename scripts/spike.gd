@@ -10,3 +10,4 @@ func handle_player_hit_hazard_top(player, hazard, normal):
 
 func handle_player_hit_hazard_side(player, hazard, normal):
 	pass
+	

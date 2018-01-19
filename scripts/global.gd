@@ -29,5 +29,3 @@ func camera_move(offset_vector):
 
 func handle_exited_center_box(direction):
 	camera_move(direction)
-
-
