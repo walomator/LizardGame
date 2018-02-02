@@ -9,11 +9,8 @@ extends "character.gd"
 
 # Floating Bug
 #	Replicable: y
-#	Pressing against a monster repeatedly may cause the air animation to play
-
-# Floating Bug 2
-#	Replicable: y
 #	Pressig against a wall will cause the air animation to switch on and off
+#	Fix: There needs to be some sort of flag when jumping that allows air animation to play
 
 var debug = false
 
@@ -123,7 +120,7 @@ func _fixed_process(delta):
 		
 		else:
 			time_since_grounded += delta
-			if is_grounded and time_since_grounded > update_delay: # BUG - Causes air animation to play when pressing on wall
+			if is_grounded and time_since_grounded > update_delay * 10: # BUG - This is a hacky fix to Floating Man Bug
 				is_grounded = false
 				update_direction()
 		
