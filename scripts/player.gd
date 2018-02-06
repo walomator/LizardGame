@@ -42,7 +42,7 @@ var force_y = 0
 var is_moving = false # Running implies specifically FAST running, to be considered if there will be multiple speeds
 var movement_mode = "idle"
 var is_grounded = true
-var time_since_grounded = 0
+var time_since_liftoff = 0
 var is_stunned = false
 var item_1 = "hookshot"
 
@@ -59,6 +59,7 @@ const AIR_ACCELERATION = 4
 
 var jump_count = 0
 var max_jump_count = 2
+var airborn = true
 
 const ActionHolder = preload("res://scripts/action_holder.gd")
 var action
@@ -99,7 +100,7 @@ func _ready():
 	
 
 func _fixed_process(delta):
-	var update_delay = delta * 2
+	var update_delay = delta
 	
 	if char_colliding():
 		var collide_normal = get_char_collision_normal()
@@ -107,10 +108,10 @@ func _fixed_process(delta):
 		
 		# Make appropriate changes if colliding surface is horizontal
 		if collide_normal == Vector2(0, -1):
-			if time_since_grounded > update_delay:
-				is_grounded = true # BUG - This means that only flat surfaces count as ground 
+			if time_since_liftoff > update_delay:
+				is_grounded = true # BUG - This means that only flat surfaces count as ground
 				update_direction()
-			time_since_grounded = 0
+			time_since_liftoff = 0
 			jump_count = 0
 			
 			var moving_direction = sign(velocity.x)
@@ -118,19 +119,18 @@ func _fixed_process(delta):
 			if moving_direction != sign(velocity.x):
 				velocity.x = 0
 		
-		else:
-			time_since_grounded += delta
-			if is_grounded and time_since_grounded > update_delay * 10: # BUG - This is a hacky fix to Floating Man Bug
-				is_grounded = false
-				update_direction()
+		elif is_grounded and time_since_liftoff > update_delay:
+			time_since_liftoff += delta
+			is_grounded = false
+			update_direction()
 		
 		if colliding_body.is_in_group("Enemies") or colliding_body.is_in_group("Hazards"): # FEAT - Should be "Collidables"
 			handle_body_collided(colliding_body, collide_normal)
 	else:
-		time_since_grounded += delta
-		if is_grounded and time_since_grounded > update_delay: # BUG - Causes air animation to play when pressing on wall
-			update_direction()
+		time_since_liftoff += delta
+		if is_grounded and time_since_liftoff > update_delay: # DEV - Seems this should occur elsewhere
 			is_grounded = false
+			update_direction()
 		if jump_count == 0: # If player fell off a ledge
 			jump_count = 1
 	# End if is_colliding():else
@@ -144,7 +144,7 @@ func _input(event):
 		emit_signal("shutdown")
 	
 	if is_stunned == true:
-		return # BUG - This should not disable ALL input
+		return # BUG - This should not disable ALL input, e.g., shutdown
 	
 	if direction:
 		last_direction = direction
@@ -274,7 +274,6 @@ func reset_position():
 
 func jump():
 #	print("jump")
-	print(collide_normal)
 	is_grounded = false
 	update_direction()
 	reset_velocity()
