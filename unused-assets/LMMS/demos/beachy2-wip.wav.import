@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/beachy2-wip.wav-3e6bdeefaa08556ad3d216a05b864461.sample"
+
+[deps]
+
+source_file="res://unused-assets/LMMS/demos/beachy2-wip.wav"
+source_md5="81ef21688a0c6a6825141aee28e16909"
+
+dest_files=[ "res://.import/beachy2-wip.wav-3e6bdeefaa08556ad3d216a05b864461.sample" ]
+dest_md5="09e0664d4c45c5c40a82dddb0814517f"
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=true
+edit/normalize=true
+edit/loop=false
+compress/mode=0

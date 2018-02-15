@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamSample"
+path="res://.import/death.wav-2eb4277b244d1ecc80b23ba9f666285e.sample"
+
+[deps]
+
+source_file="res://sound/monsters/generic/death.wav"
+source_md5="ad70918673ffc45e47f7419f2c544f4c"
+
+dest_files=[ "res://.import/death.wav-2eb4277b244d1ecc80b23ba9f666285e.sample" ]
+dest_md5="0c6f709e5f377ff30a1043f46466e824"
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=true
+edit/normalize=true
+edit/loop=false
+compress/mode=0

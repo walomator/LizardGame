@@ -1,0 +1,42 @@
+[application]
+
+icon = "res://icon.png"
+main_scene = "res://scenes/World.tscn"
+name = "LizardGame"
+
+[autoload]
+
+Global = "*res://scripts/global.gd"
+
+[display]
+
+stretch/aspect = "keep"
+stretch/mode = "viewport"
+window/fullscreen = true
+window/height = 360
+window/width = 640
+
+[editor_plugins]
+
+enabled = [ "vnen.tiled_importer" ]
+
+[image_loader]
+
+filter = false
+gen_mipmaps = false
+
+[input]
+
+combat_action_1 = [ InputEvent(KEY,90) ]
+debug = [ InputEvent(KEY,81) ]
+move_down = [ InputEvent(KEY,16777234), InputEvent(KEY,83) ]
+move_left = [ InputEvent(KEY,16777231), InputEvent(KEY,65) ]
+move_right = [ InputEvent(KEY,16777233), InputEvent(KEY,68) ]
+move_up = [ InputEvent(KEY,16777232), InputEvent(KEY,87) ]
+reset = [ InputEvent(KEY,82) ]
+shutdown = [ InputEvent(KEY,16777217) ]
+ui_down = [  ]
+ui_left = [  ]
+ui_right = [  ]
+ui_up = [  ]
+

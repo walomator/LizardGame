@@ -1,4 +1,4 @@
-[gd_resource type="SpriteFrames" load_steps=5 format=1]
+[gd_resource type="SpriteFrames" load_steps=1 format=2]
 
 [ext_resource path="res://textures/protagonist/fall/1.png" type="Texture" id=1]
 [ext_resource path="res://textures/protagonist/fall/2.png" type="Texture" id=2]
@@ -13,4 +13,3 @@ animations = [ {
 "name": "default",
 "speed": 10.0
 } ]
-
