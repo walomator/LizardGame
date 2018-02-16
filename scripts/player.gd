@@ -64,14 +64,9 @@ var airborn = true
 const ActionHolder = preload("res://scripts/action_holder.gd")
 var action
 
-var name = "Protagonist"
-
 func _ready():
 	_set_health(MAX_HEALTH)
 	_set_is_weighted(true)
-	
-	set_fixed_process(true)
-	set_process_input(true)
 	
 	var path_to_protagonist_node = "/root/World/Protagonist/"
 	var path_to_scoreboard_node = "/root/World/Scoreboard/"
@@ -99,7 +94,7 @@ func _ready():
 	action = ActionHolder.new()
 	
 
-func _fixed_process(delta):
+func _physics_process(delta):
 	var update_delay = delta
 	
 	if char_colliding():
@@ -124,7 +119,7 @@ func _fixed_process(delta):
 			is_grounded = false
 			update_direction()
 		
-		if colliding_body.is_in_group("Enemies") or colliding_body.is_in_group("Hazards"): # FEAT - Should be "Collidables"
+		if colliding_body and (colliding_body.is_in_group("Enemies") or colliding_body.is_in_group("Hazards")): # FEAT - Should be "Collidables"
 			handle_body_collided(colliding_body, collide_normal)
 	else:
 		time_since_liftoff += delta
@@ -268,7 +263,7 @@ func reel(reel_force, normal):
 	
 
 func reset_position():
-	self.set_pos(Vector2(start_pos_x, start_pos_y))
+	self.position = Vector2(start_pos_x, start_pos_y)
 	reset_velocity()
 	
 
@@ -293,7 +288,7 @@ func launch_particle(particle_type):
 	get_tree().get_root().add_child(particle)
 	particle.set_direction(last_direction)
 	particle.set_spawner(self)
-	particle.set_global_pos(self.get_pos()) # BUG - Not centered
+	particle.set_global_pos(self.position) # BUG - Not centered
 	
 
 func debug():

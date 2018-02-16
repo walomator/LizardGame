@@ -21,7 +21,7 @@ func _ready():
 	pass
 	
 
-func _fixed_process(delta):
+func _physics_process(delta):
 	if is_weighted == true:
 		# Increase velocity due to gravity
 		velocity.y += GRAVITY * delta
@@ -30,15 +30,15 @@ func _fixed_process(delta):
 		velocity = velocity.normalized() * min(velocity.length(), MAX_VELOCITY)
 		
 		# Try to move initially. Return the remainder of movement after collision
-		move_remainder = move((velocity + controller_velocity) * delta)
+		move_remainder = move_and_slide((velocity + controller_velocity) * delta)
 		var controller_velocity = Vector2(0, 0)
 		
-		# If there is a collision, there will be a nonzero move_remainder and is_colliding will return true
-		if is_colliding():
+		# If there is a collision, there will be a nonzero move_remainder and is_on_wall will return true
+		if is_on_wall(): # if floor_normal is (0, 0) then everything is a wall
 			collide_normal = get_collision_normal()
 			colliding_body = get_collider()
 			
-			move(collide_normal.slide(move_remainder))
+			move_and_slide(collide_normal.slide(move_remainder))
 			
 			# Prevent incorrect acceleration due to gravity on surfaces 
 			velocity.y = collide_normal.slide(Vector2(0, velocity.y)).y
@@ -47,7 +47,7 @@ func _fixed_process(delta):
 			colliding_body = null
 	
 
-func char_colliding():
+func char_colliding(): # DEV - Should be called is_char_colliding
 	var state = true
 	if move_remainder == Vector2(0, 0):
 		state = false
