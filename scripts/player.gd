@@ -219,22 +219,22 @@ func switch_mode(character_mode): # Updates sprite
 #		print("grounded")
 		move_anim_node.stop()
 		fall_anim_node.stop()
-		idle_sprite_node.set_hidden(false)
-		move_anim_node.set_hidden(true)
-		fall_anim_node.set_hidden(true)
+		idle_sprite_node.visible = true
+		move_anim_node.visible = false
+		fall_anim_node.visible = false
 	elif character_mode == "moving":
 		move_anim_node.play()
 		fall_anim_node.stop()
-		idle_sprite_node.set_hidden(true)
-		move_anim_node.set_hidden(false)
-		fall_anim_node.set_hidden(true)
+		idle_sprite_node.visible = false
+		move_anim_node.visible = true
+		fall_anim_node.visible = false
 	elif character_mode == "air":
 #		print("airborn")
 		move_anim_node.stop()
 		fall_anim_node.play()
-		idle_sprite_node.set_hidden(true)
-		move_anim_node.set_hidden(true)
-		fall_anim_node.set_hidden(false)
+		idle_sprite_node.visible = false
+		move_anim_node.visible = false
+		fall_anim_node.visible = true
 	elif character_mode == "stunned":
 		pass
 	
@@ -292,7 +292,7 @@ func launch_particle(particle_type):
 	
 
 func debug():
-	print(collide_normal)
+	move_and_slide(Vector2(0, 7))
 	
 
 func handle_body_collided(colliding_body, collision_normal): # DEV - This function name is misleading

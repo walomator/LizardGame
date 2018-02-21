@@ -1,5 +1,5 @@
 extends "monster.gd"
-# parent class has _fixed_process
+# parent class has _physics_process
 
 const FLICKER_INTERVAL = 0.01
 const PLAY_DEAD_TIME = 0.4
@@ -9,7 +9,7 @@ func _ready():
 	_set_health    (2)
 	_set_damage    (1)
 	
-	set_fixed_process(true)
+	set_physics_process(true)
 	
 	self.connect("body_collided", collision_handler_node, "handle_body_collided")
 	

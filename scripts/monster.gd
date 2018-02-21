@@ -12,7 +12,7 @@ var damage     = 1
 const SimpleTimer = preload("res://scripts/simple_timer.gd")
 
 func _ready():
-	set_fixed_process(true)
+#	set_fixed_process(true)
 	
 	self.connect("body_collided", collision_handler_node, "handle_body_collided")
 	
@@ -21,8 +21,8 @@ func _ready():
 	idle_anim_node.play()
 	
 
-func _fixed_process(delta):
-	if is_colliding():
+func _physics_process(delta):
+	if is_on_wall():
 		if get_collider().is_in_group("Players"):
 			emit_signal("body_collided", self, get_collider(), get_collision_normal())
 	

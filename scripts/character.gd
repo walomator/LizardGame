@@ -30,18 +30,20 @@ func _physics_process(delta):
 		velocity = velocity.normalized() * min(velocity.length(), MAX_VELOCITY)
 		
 		# Try to move initially. Return the remainder of movement after collision
-		move_remainder = move_and_slide((velocity + controller_velocity) * delta)
+		move_remainder = move_and_slide(velocity + controller_velocity)
 		var controller_velocity = Vector2(0, 0)
 		
 		# If there is a collision, there will be a nonzero move_remainder and is_on_wall will return true
 		if is_on_wall(): # if floor_normal is (0, 0) then everything is a wall
-			collide_normal = get_collision_normal()
-			colliding_body = get_collider()
+			collide_normal = get_slide_collision(0).normal
+#			colliding_body = get_collider()
+			colliding_body = null # DEV - temporary, until alternative is discovered in 3.0
 			
-			move_and_slide(collide_normal.slide(move_remainder))
+#			move_and_slide(collide_normal.slide(move_remainder))
 			
 			# Prevent incorrect acceleration due to gravity on surfaces 
-			velocity.y = collide_normal.slide(Vector2(0, velocity.y)).y
+#			velocity.y = collide_normal.slide(Vector2(0, velocity.y)).y
+			velocity.y = 0 # BUG - Very bad fix for not having a slide function in 3.0
 		else:
 			collide_normal = Vector2(0, 0)
 			colliding_body = null

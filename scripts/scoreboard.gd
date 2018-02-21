@@ -30,7 +30,7 @@ func handle_bumped_enemy():
 
 func handle_passed_end_level():
 	print("Level complete!")
-	get_node("/root/World/Protagonist/Camera2D/Sprite").set_hidden(false)
+	get_node("/root/World/Protagonist/Camera2D/Sprite").visible = true
 	_write_scoreboard("Level complete!")
 	score_locked = true
 	
