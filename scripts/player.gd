@@ -97,7 +97,7 @@ func _ready():
 func _physics_process(delta):
 	var update_delay = delta
 	
-	if char_colliding():
+	if is_char_colliding():
 		var collide_normal = get_char_collision_normal()
 		var colliding_body = get_char_collider()
 		
@@ -292,7 +292,7 @@ func launch_particle(particle_type):
 	
 
 func debug():
-	move_and_slide(Vector2(0, 7))
+	print(velocity.y)
 	
 
 func handle_body_collided(colliding_body, collision_normal): # DEV - This function name is misleading

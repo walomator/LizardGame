@@ -17,7 +17,6 @@ var colliding_body = null
 const SimpleTimer = preload("res://scripts/simple_timer.gd")
 
 func _ready():
-#	set_fixed_process(true)
 	pass
 	
 
@@ -30,28 +29,28 @@ func _physics_process(delta):
 		velocity = velocity.normalized() * min(velocity.length(), MAX_VELOCITY)
 		
 		# Try to move initially. Return the remainder of movement after collision
-		move_remainder = move_and_slide(velocity + controller_velocity)
-		var controller_velocity = Vector2(0, 0)
+		# 1st arg is linear_velocity, no delta
+		# 2nd arg is the expected normal vector of the floor
+		move_and_slide(velocity + controller_velocity, Vector2(0, -1))
 		
 		# If there is a collision, there will be a nonzero move_remainder and is_on_wall will return true
-		if is_on_wall(): # if floor_normal is (0, 0) then everything is a wall
-			collide_normal = get_slide_collision(0).normal
-#			colliding_body = get_collider()
-			colliding_body = null # DEV - temporary, until alternative is discovered in 3.0
+		if is_on_floor():
+			# Prevent incorrect acceleration due to gravity while on ground 
+			velocity.y = 0
+			# BUG - is_on_floor colliding doesn't mean I can get a colliding object, I guess
+			var collide = get_slide_collision(0)
+			if collide:
+				collide_normal = collide.normal
+				colliding_body = collide.collider
 			
-#			move_and_slide(collide_normal.slide(move_remainder))
-			
-			# Prevent incorrect acceleration due to gravity on surfaces 
-#			velocity.y = collide_normal.slide(Vector2(0, velocity.y)).y
-			velocity.y = 0 # BUG - Very bad fix for not having a slide function in 3.0
 		else:
 			collide_normal = Vector2(0, 0)
 			colliding_body = null
-	
+		
 
-func char_colliding(): # DEV - Should be called is_char_colliding
+func is_char_colliding():
 	var state = true
-	if move_remainder == Vector2(0, 0):
+	if collide_normal == Vector2(0, 0):
 		state = false
 	return state
 	

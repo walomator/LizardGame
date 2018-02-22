@@ -25,7 +25,7 @@ func handle_death():
 
 func play_dead():
 	flicker("death")
-	sound_node.play("death")
+	sound_node.play()
 	
 
 func flicker(mode):
@@ -34,7 +34,7 @@ func flicker(mode):
 	
 
 func flicker_switch():
-	idle_anim_node.set_hidden(not idle_anim_node.is_hidden())
+	idle_anim_node.visible = not idle_anim_node.visible
 	
 
 func handle_timeout(object_timer, name):
