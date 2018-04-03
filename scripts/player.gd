@@ -1,6 +1,5 @@
 extends "character.gd"
 
-
 # Buglist
 # Running Man Bug
 #	Replicable: y
@@ -40,9 +39,8 @@ var run_speed = 0
 var force_x = 0
 var force_y = 0
 var is_moving = false # Running implies specifically FAST running, to be considered if there will be multiple speeds
-var movement_mode = "idle"
 var is_grounded = true
-var time_since_liftoff = 0
+var time_since_liftoff = 0 # DEV - Should be local to _physics_process
 var is_stunned = false
 var item_1 = "hookshot"
 
@@ -63,6 +61,11 @@ var airborn = true
 
 const ActionHolder = preload("res://scripts/action_holder.gd")
 var action
+
+# State machine possible states.
+const StandingState = preload("res://scripts/player_states/StandingState.gd")
+const RunningState  = preload("res://scripts/player_states/RunningState.gd")
+var state = StandingState.new(self)
 
 func _ready():
 	_set_health(MAX_HEALTH)
@@ -87,51 +90,30 @@ func _ready():
 	center_box_node        = get_node(path_to_center_box_node)
 	
 	root_node.call_deferred("add_child", center_box_node)
-	
 	self.connect("body_collided", collision_handler_node, "handle_body_collided")
 	self.connect("shutdown", global_node, "handle_shutdown") # BUG - The user loses control if the player object is gone
 	self.connect("exited_center_box", global_node, "handle_exited_center_box")
+	
 	action = ActionHolder.new()
+	
+#	set_state("StandingState") # This is already instantiated beforehand
 	
 
 func _physics_process(delta):
-	var update_delay = delta
+	state.state_process(delta)
+		
 	
-	if is_char_colliding():
-		var collide_normal = get_char_collision_normal()
-		var colliding_body = get_char_collider()
-		
-		# Make appropriate changes if colliding surface is horizontal
-		if collide_normal == Vector2(0, -1):
-			if time_since_liftoff > update_delay:
-				is_grounded = true # BUG - This means that only flat surfaces count as ground
-				update_direction()
-			time_since_liftoff = 0
-			jump_count = 0
-			
-			var moving_direction = sign(velocity.x)
-			velocity.x -= moving_direction * GROUND_DRAG * delta # Decelerate player if sliding without input
-			if moving_direction != sign(velocity.x):
-				velocity.x = 0
-		
-		elif is_grounded and time_since_liftoff > update_delay:
-			time_since_liftoff += delta
-			is_grounded = false
-			update_direction()
-		
-		if colliding_body and (colliding_body.is_in_group("Enemies") or colliding_body.is_in_group("Hazards")): # FEAT - Should be "Collidables"
-			handle_body_collided(colliding_body, collide_normal)
+
+func set_state(new_state):
+	var old_state = state
+	if new_state == "StandingState":
+		state = StandingState.new(self)
+	elif new_state == "RunningState":
+		state = RunningState.new(self)
 	else:
-		time_since_liftoff += delta
-		if is_grounded and time_since_liftoff > update_delay: # DEV - Seems this should occur elsewhere
-			is_grounded = false
-			update_direction()
-		if jump_count == 0: # If player fell off a ledge
-			jump_count = 1
-	# End if is_colliding():else
-	
-	# Set additional velocity caused by player input
-	set_controller_velocity(Vector2(run_speed, 0))
+		return
+		
+	old_state.queue_free()
 	
 
 func _input(event):
@@ -171,6 +153,18 @@ func _input(event):
 	
 	if event.is_action_pressed("debug"):
 		debug()
+	
+
+func handle_landing(): # Should be handled by state machine
+	is_grounded = true
+	update_direction()
+	jump_count = 0
+	print("landed")
+	
+#	var moving_direction = sign(velocity.x)
+#	velocity.x -= moving_direction * GROUND_DRAG * delta # Decelerate player if sliding without input
+#	if moving_direction != sign(velocity.x):
+#		velocity.x = 0
 	
 
 func handle_timeout(object_timer, name): # Called by timer after it times out
@@ -214,7 +208,7 @@ func update_direction(): # Decides how to update sprite
 		flip_sprite(true)
 	
 
-func switch_mode(character_mode): # Updates sprite
+func switch_mode(character_mode): # Updates sprite # DEV - Should be phased out for state system
 	if character_mode == "still":
 #		print("grounded")
 		move_anim_node.stop()
@@ -292,7 +286,7 @@ func launch_particle(particle_type):
 	
 
 func debug():
-	print(velocity.y)
+	set_state("RunningState")
 	
 
 func handle_body_collided(colliding_body, collision_normal): # DEV - This function name is misleading
