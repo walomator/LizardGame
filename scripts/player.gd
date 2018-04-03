@@ -63,8 +63,8 @@ const ActionHolder = preload("res://scripts/action_holder.gd")
 var action
 
 # State machine possible states.
-const StandingState = preload("res://scripts/player_states/StandingState.gd")
-const RunningState  = preload("res://scripts/player_states/RunningState.gd")
+const StandingState = preload("res://scripts/states/StandingState.gd")
+const RunningState  = preload("res://scripts/states/RunningState.gd")
 var state = StandingState.new(self)
 
 func _ready():
