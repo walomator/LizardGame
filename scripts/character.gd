@@ -38,10 +38,11 @@ func _physics_process(delta):
 			# Prevent incorrect acceleration due to gravity while on ground 
 			velocity.y = 0
 			# BUG - is_on_floor colliding doesn't mean I can get a colliding object, I guess
-			var collide = get_slide_collision(0)
-			if collide:
-				collide_normal = collide.normal
-				colliding_body = collide.collider
+			if get_slide_count() > 0:
+				var collide = get_slide_collision(0)
+				if collide:
+					collide_normal = collide.normal
+					colliding_body = collide.collider
 			
 		else:
 			collide_normal = Vector2(0, 0)
