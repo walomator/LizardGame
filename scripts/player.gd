@@ -64,7 +64,7 @@ var action
 
 # State machine possible states.
 const StandingState = preload("res://scripts/states/StandingState.gd")
-const RunningState  = preload("res://scripts/states/RunningState.gd")
+const JumpingState  = preload("res://scripts/states/JumpingState.gd")
 var state = StandingState.new(self)
 
 func _ready():
@@ -89,7 +89,7 @@ func _ready():
 	root_node              = get_node("/root/")
 	center_box_node        = get_node(path_to_center_box_node)
 	
-	root_node.call_deferred("add_child", center_box_node)
+	root_node.call_deferred("add_child", center_box_node) # DEV - This should be handled elsewhere
 	self.connect("body_collided", collision_handler_node, "handle_body_collided")
 	self.connect("shutdown", global_node, "handle_shutdown") # BUG - The user loses control if the player object is gone
 	self.connect("exited_center_box", global_node, "handle_exited_center_box")
@@ -101,19 +101,6 @@ func _ready():
 
 func _physics_process(delta):
 	state.state_process(delta)
-		
-	
-
-func set_state(new_state):
-	var old_state = state
-	if new_state == "StandingState":
-		state = StandingState.new(self)
-	elif new_state == "RunningState":
-		state = RunningState.new(self)
-	else:
-		return
-		
-	old_state.queue_free()
 	
 
 func _input(event):
@@ -141,7 +128,7 @@ func _input(event):
 		update_direction()
 	
 	if event.is_action_pressed("move_up") and jump_count < max_jump_count:
-		jump()
+		state.jump()
 	
 	if event.is_action_pressed("reset"):
 #		print("reset")
@@ -153,6 +140,20 @@ func _input(event):
 	
 	if event.is_action_pressed("debug"):
 		debug()
+	
+
+func set_state(new_state): # These don't need to be instances right _now_
+	print("State changed.")
+	var old_state = state
+	if new_state == "StandingState":
+		state = StandingState.new(self)
+	elif new_state == "JumpingState":
+		state = JumpingState.new(self)
+	else:
+		return
+		
+	state.start()
+	old_state.queue_free()
 	
 
 func handle_landing(): # Should be handled by state machine
@@ -261,10 +262,7 @@ func reset_position():
 	reset_velocity()
 	
 
-func jump():
-#	print("jump")
-	is_grounded = false
-	update_direction()
+func default_jump():
 	reset_velocity()
 	increase_velocity(Vector2(0, -JUMP_FORCE))
 	jump_count += 1
@@ -286,7 +284,8 @@ func launch_particle(particle_type):
 	
 
 func debug():
-	set_state("RunningState")
+	print("jump_count: ", jump_count)
+	print("state: ", state.get_name())
 	
 
 func handle_body_collided(colliding_body, collision_normal): # DEV - This function name is misleading

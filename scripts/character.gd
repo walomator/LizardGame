@@ -5,7 +5,7 @@ const GRAVITY      = 400
 const MAX_VELOCITY = 1000
 const AIR_DRAG     = 0
 
-var collision_box_node
+var collision_box_node # Implemented in monster.gd, but not player.gd
 var is_weighted = false
 var health = 1
 var velocity = Vector2(0, 0)
@@ -37,16 +37,16 @@ func _physics_process(delta):
 		if is_on_floor():
 			# Prevent incorrect acceleration due to gravity while on ground 
 			velocity.y = 0
-			# BUG - is_on_floor colliding doesn't mean I can get a colliding object, I guess
-			if get_slide_count() > 0:
-				var collide = get_slide_collision(0)
-				if collide:
-					collide_normal = collide.normal
-					colliding_body = collide.collider
 			
-		else:
-			collide_normal = Vector2(0, 0)
-			colliding_body = null
+#			if get_slide_count() > 0:
+#				var collide = get_slide_collision(0)
+#				if collide:
+#					collide_normal = collide.normal
+#					colliding_body = collide.collider
+#
+#		else:
+#			collide_normal = Vector2(0, 0)
+#			colliding_body = null
 		
 
 func is_char_colliding():
