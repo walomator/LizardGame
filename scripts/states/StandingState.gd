@@ -1,5 +1,6 @@
 extends Node
 
+var exiting
 var is_grounded = true # DEV - Not currently implemented, but may solve the jumping problem
 var player
 var state_name = "StandingState"
@@ -24,6 +25,10 @@ func state_process(delta):
 	
 
 func set_state(new_state):
+	if exiting == true:
+		return
+	exiting = true
+	
 	player.idle_sprite_node.visible = false
 	player.set_state(new_state)
 	

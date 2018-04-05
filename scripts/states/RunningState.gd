@@ -1,5 +1,6 @@
 extends Node
 
+var exiting = false # Prevents double state-setting
 var is_grounded = true # DEV - Not currently implemented, but may solve the jumping problem
 var player
 var state_name = "RunningState"
@@ -25,6 +26,10 @@ func state_process(delta):
 	
 
 func set_state(new_state):
+	if exiting == true:
+		return
+	exiting = true
+	
 	player.move_anim_node.stop()
 	player.move_anim_node.visible = false
 	player.set_state(new_state)

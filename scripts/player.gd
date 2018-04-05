@@ -66,6 +66,7 @@ var action
 const StandingState = preload("res://scripts/states/StandingState.gd")
 const RunningState  = preload("res://scripts/states/RunningState.gd")
 const JumpingState  = preload("res://scripts/states/JumpingState.gd")
+const StunnedState  = preload("res://scripts/states/StunnedState.gd")
 var state = StandingState.new(self)
 
 func _ready():
@@ -100,6 +101,10 @@ func _ready():
 
 func _process(delta):
 	state.state_process(delta)
+	
+	var colliding_body = get_char_collider()
+	if colliding_body and (colliding_body.is_in_group("Enemies") or colliding_body.is_in_group("Hazards")): # FEAT - Should be "Collidables"
+		handle_body_collided(colliding_body, collide_normal)
 	
 
 func _input(event):
@@ -147,6 +152,8 @@ func set_state(new_state): # These don't need to be instances right _now_
 		state = RunningState.new(self)
 	elif new_state == "JumpingState":
 		state = JumpingState.new(self)
+	elif new_state == "StunnedState":
+		state = StunnedState.new(self, old_state.state_name)
 	else:
 		print("invalid state")
 		
@@ -154,9 +161,8 @@ func set_state(new_state): # These don't need to be instances right _now_
 	old_state.queue_free()
 	
 
-func handle_timeout(object_timer, name): # Called by timer after it times out
-	if name == "unstun":
-		is_stunned = false
+func handle_timeout(object_timer, timer_name): # Called by timer after it times out
+	state.handle_timeout(timer_name)
 	object_timer.queue_free()
 	
 
@@ -232,8 +238,9 @@ func launch_particle(particle_type):
 	
 
 func debug():
-	print("jump_count: ", jump_count)
-	print("state: ", state.get_name())
+	print("----------------")
+#	print("jump_count: ", jump_count)
+#	print("state: ", state.get_name())
 	
 
 func handle_body_collided(colliding_body, collision_normal): # DEV - This function name is misleading

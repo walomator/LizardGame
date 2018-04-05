@@ -8,6 +8,7 @@ extends Node
 #   The player goes back to a standing animation despite being in JumpingState
 #   When running off a ledge
 
+var exiting
 var is_grounded = true
 var player
 var state_name = "JumpingState"
@@ -33,6 +34,10 @@ func state_process(delta):
 	
 
 func set_state(new_state):
+	if exiting == true:
+		return
+	exiting = true
+	
 	if new_state == "StandingState" or new_state == "RunningState":
 		player.jump_count = 0
 		
@@ -43,7 +48,7 @@ func set_state(new_state):
 	
 
 func jump():
-	pass
+	player.default_jump()
 	
 
 func get_name():

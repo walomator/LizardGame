@@ -2,23 +2,39 @@ extends Node
 
 # This state describes when a player has been stunned. It is up to an
 # externally set timer to release the player from this state.
+var exiting
 var player
 var state_name = "StunnedState"
+var stun_time
+var old_state_name
+var stun_timer
 
-func _init(controlled_player):
+func _init(controlled_player, player_stun_time, player_old_state_name):
 	player = controlled_player
+	stun_time = player_stun_time
+	old_state_name = player_old_state_name
 	player.set_controller_velocity(Vector2(0, 0))
-
+	
 
 func start():
 	player.idle_sprite_node.visible = true
-
+	player.start_timer("unstun", stun_time)
+	
 
 func state_process(delta):
 	pass
+	
 
+func handle_timeout(timer_name): # Called by timer after it times out
+	if timer_name == "unstun":
+		set_state(old_state_name) # DEV - This could possibly be problematic
+	
 
-func set_state(new_state): # Should be called externally by a timer
+func set_state(new_state):
+	if exiting == true:
+		return
+	exiting = true
+	
 	player.idle_sprite_node.visible = false
 	player.set_state(new_state)
 
