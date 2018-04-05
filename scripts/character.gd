@@ -50,10 +50,10 @@ func _physics_process(delta):
 		
 
 func is_char_colliding():
-	var state = true
+	var test = true
 	if collide_normal == Vector2(0, 0):
-		state = false
-	return state
+		test = false
+	return test
 	
 
 func get_char_collision_normal():
@@ -76,6 +76,12 @@ func reset_velocity():
 	velocity = Vector2(0, 0)
 	
 
+func drag(ground_drag, delta):
+	var moving_direction = sign(velocity.x)
+	velocity.x -= moving_direction * ground_drag * delta # Decelerate player if sliding without input
+	if moving_direction != sign(velocity.x):
+		velocity.x = 0
+	
 func set_controller_velocity(char_controller_velocity):
 	controller_velocity = char_controller_velocity
 	

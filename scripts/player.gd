@@ -64,6 +64,7 @@ var action
 
 # State machine possible states.
 const StandingState = preload("res://scripts/states/StandingState.gd")
+const RunningState  = preload("res://scripts/states/RunningState.gd")
 const JumpingState  = preload("res://scripts/states/JumpingState.gd")
 var state = StandingState.new(self)
 
@@ -96,10 +97,8 @@ func _ready():
 	
 	action = ActionHolder.new()
 	
-#	set_state("StandingState") # This is already instantiated beforehand
-	
 
-func _physics_process(delta):
+func _process(delta):
 	state.state_process(delta)
 	
 
@@ -131,11 +130,9 @@ func _input(event):
 		state.jump()
 	
 	if event.is_action_pressed("reset"):
-#		print("reset")
 		reset_position()
 	
 	if event.is_action_pressed("combat_action_1"):
-#		print("fireball")
 		launch_particle(item_1)
 	
 	if event.is_action_pressed("debug"):
@@ -143,29 +140,18 @@ func _input(event):
 	
 
 func set_state(new_state): # These don't need to be instances right _now_
-	print("State changed.")
 	var old_state = state
-	if new_state == "StandingState":
+	if   new_state == "StandingState":
 		state = StandingState.new(self)
+	elif new_state == "RunningState":
+		state = RunningState.new(self)
 	elif new_state == "JumpingState":
 		state = JumpingState.new(self)
 	else:
-		return
+		print("invalid state")
 		
 	state.start()
 	old_state.queue_free()
-	
-
-func handle_landing(): # Should be handled by state machine
-	is_grounded = true
-	update_direction()
-	jump_count = 0
-	print("landed")
-	
-#	var moving_direction = sign(velocity.x)
-#	velocity.x -= moving_direction * GROUND_DRAG * delta # Decelerate player if sliding without input
-#	if moving_direction != sign(velocity.x):
-#		velocity.x = 0
 	
 
 func handle_timeout(object_timer, name): # Called by timer after it times out
@@ -174,7 +160,7 @@ func handle_timeout(object_timer, name): # Called by timer after it times out
 	object_timer.queue_free()
 	
 
-func flip_sprite(is_flipped):
+func flip_sprite(is_flipped): # DEV - Should be part of character.gd
 	idle_sprite_node.set_flip_h(is_flipped)
 	move_anim_node.set_flip_h(is_flipped)
 	fall_anim_node.set_flip_h(is_flipped)
@@ -195,66 +181,27 @@ func update_direction(): # Decides how to update sprite
 	else:
 		is_moving = true
 	
-	if is_grounded:
-		if is_moving:
-			switch_mode("moving")
-		else:
-			switch_mode("still")
-	else:
-		switch_mode("air")
-	
 	if direction > 0:
 		flip_sprite(false)
 	if direction < 0:
 		flip_sprite(true)
 	
 
-func switch_mode(character_mode): # Updates sprite # DEV - Should be phased out for state system
-	if character_mode == "still":
-#		print("grounded")
-		move_anim_node.stop()
-		fall_anim_node.stop()
-		idle_sprite_node.visible = true
-		move_anim_node.visible = false
-		fall_anim_node.visible = false
-	elif character_mode == "moving":
-		move_anim_node.play()
-		fall_anim_node.stop()
-		idle_sprite_node.visible = false
-		move_anim_node.visible = true
-		fall_anim_node.visible = false
-	elif character_mode == "air":
-#		print("airborn")
-		move_anim_node.stop()
-		fall_anim_node.play()
-		idle_sprite_node.visible = false
-		move_anim_node.visible = false
-		fall_anim_node.visible = true
-	elif character_mode == "stunned":
-		pass
-	
-
 func bounce(bounce_force): # Should be called externally
 	is_grounded = false
-	update_direction()
 	reset_velocity()
-#	force_y = -bounce_force
 	increase_velocity(Vector2(0, -bounce_force))
 	jump_count = 1
 	
 
 func reel(reel_force, normal):
 	is_stunned = true
-#	is_grounded = false
-#	update_direction()
 	reset_velocity()
-#	force_x = normal.x * reel_force
 	increase_velocity(Vector2(normal.x * reel_force, 0))
-#	jump_count = 1
 	direction = 0
 	action.clear()
 	update_direction()
-	switch_mode("stunned")
+#	switch_mode("stunned") # DEV - Implement as a state
 	
 
 func reset_position():
@@ -263,10 +210,11 @@ func reset_position():
 	
 
 func default_jump():
-	reset_velocity()
-	increase_velocity(Vector2(0, -JUMP_FORCE))
-	jump_count += 1
-	# FEAT - Variable jump length needed
+	if jump_count < max_jump_count:
+		reset_velocity()
+		increase_velocity(Vector2(0, -JUMP_FORCE))
+		jump_count += 1
+		# FEAT - Variable jump length needed
 	
 
 func launch_particle(particle_type):

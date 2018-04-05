@@ -17,28 +17,41 @@ func _init(controlled_player):
 	
 
 func start():
-	player.move_anim_node.stop()
 	player.fall_anim_node.play()
-	player.idle_sprite_node.visible = false
-	player.move_anim_node.visible = false
 	player.fall_anim_node.visible = true
+	
+	if player.jump_count == 0:
+		player.jump_count = 1
+	
 
 func state_process(delta):
 	# Set velocity caused by player input for handling by character.gd
 	player.set_controller_velocity(Vector2(player.run_speed, 0))
 	
 	if is_on_ground(): # BUG - This returns true instantly, b/c player is on floor
-		player.set_state("StandingState")
+		set_state("StandingState")
+	
+
+func set_state(new_state):
+	if new_state == "StandingState" or new_state == "RunningState":
+		player.jump_count = 0
+		
+	player.fall_anim_node.stop()
+	player.fall_anim_node.visible = false
+	
+	player.set_state(new_state)
 	
 
 func jump():
-	pass # FEAT - Allow for double jumps or holding jumps
+	pass
 	
 
 func get_name():
 	return state_name
 	
 
-func is_on_ground(): # DEV - Should check if player just jumped
-	return player.test_move(player.get_transform(), Vector2(0, 1))
-	
+func is_on_ground():
+	var test = false
+	if player.velocity.y >= 0:
+		test = player.test_move(player.get_transform(), Vector2(0, 1))
+	return test
