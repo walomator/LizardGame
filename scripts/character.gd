@@ -86,9 +86,9 @@ func set_controller_velocity(char_controller_velocity):
 	controller_velocity = char_controller_velocity
 	
 
-func start_timer(name, time):
+func start_timer(timer_name, time):
 	var simple_timer = SimpleTimer.new()
-	simple_timer.start(self, name, time)
+	simple_timer.start(self, timer_name, time)
 	
 
 func _set_health(character_health):

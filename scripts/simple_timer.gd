@@ -4,7 +4,7 @@ func _ready():
 	pass
 	
 
-func start(initiator, name, time):
+func start(initiator, timer_name, time):
 	var timer = Timer.new()
 	timer.connect("timeout", initiator, "handle_timeout", [timer, name])
 	initiator.add_child(timer)
