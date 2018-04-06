@@ -33,21 +33,29 @@ func _physics_process(delta):
 		# 2nd arg is the expected normal vector of the floor
 		move_and_slide(velocity + controller_velocity, Vector2(0, -1))
 		
-		# If there is a collision, there will be a nonzero move_remainder and is_on_wall will return true
-		if is_on_floor():
-			# Prevent incorrect acceleration due to gravity while on ground 
-			velocity.y = 0
+		var entity_collision = null
+		if _is_on_surface():
+			# If there is a collision on the ground, stop acceleration due to gravity 
+			if is_on_floor():
+				velocity.y = 0
+				
 			
-#			if get_slide_count() > 0:
-#				var collide = get_slide_collision(0)
-#				if collide:
-#					collide_normal = collide.normal
-#					colliding_body = collide.collider
-#
-#		else:
-#			collide_normal = Vector2(0, 0)
-#			colliding_body = null
+			# If there is a collision with an entity, collect information
+			if get_slide_count() > 0:
+				entity_collision = get_slide_collision(0)
+				collide_normal = entity_collision.normal
+				colliding_body = entity_collision.collider
+			
+		# End if is on a surface
+		if entity_collision == null:
+			collide_normal = Vector2(0, 0)
+			colliding_body = null
 		
+	# End if is_weighted
+
+func _is_on_surface():
+	return is_on_floor() or is_on_wall() or is_on_ceiling()
+	
 
 func is_char_colliding():
 	var test = true

@@ -25,6 +25,10 @@ func state_process(delta):
 	player.set_controller_velocity(Vector2(player.run_speed, 0))
 	
 
+func handle_timeout(timer_name):
+	pass
+	
+
 func set_state(new_state):
 	if exiting == true:
 		return

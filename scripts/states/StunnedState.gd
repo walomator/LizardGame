@@ -2,7 +2,7 @@ extends Node
 
 # This state describes when a player has been stunned. It is up to an
 # externally set timer to release the player from this state.
-var exiting
+var exiting = false
 var player
 var state_name = "StunnedState"
 var stun_time
@@ -22,7 +22,7 @@ func start():
 	
 
 func state_process(delta):
-	pass
+	player.drag(player.GROUND_DRAG, delta)
 	
 
 func handle_timeout(timer_name): # Called by timer after it times out
@@ -37,15 +37,11 @@ func set_state(new_state):
 	
 	player.idle_sprite_node.visible = false
 	player.set_state(new_state)
-
+	
 
 func jump():
 	pass
-
+	
 
 func get_name():
 	return state_name
-
-
-func is_in_air():
-	return not player.test_move(player.get_transform(), Vector2(0, 1))

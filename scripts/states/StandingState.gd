@@ -1,6 +1,6 @@
 extends Node
 
-var exiting
+var exiting = false
 var is_grounded = true # DEV - Not currently implemented, but may solve the jumping problem
 var player
 var state_name = "StandingState"
@@ -22,6 +22,10 @@ func state_process(delta):
 	
 	# Set velocity caused by player input for handling by character.gd
 	player.set_controller_velocity(Vector2(player.run_speed, 0))
+	
+
+func handle_timeout(timer_name):
+	pass
 	
 
 func set_state(new_state):

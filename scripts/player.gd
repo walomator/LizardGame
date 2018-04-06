@@ -41,7 +41,7 @@ var force_y = 0
 var is_moving = false # Running implies specifically FAST running, to be considered if there will be multiple speeds
 var is_grounded = true
 var time_since_liftoff = 0 # DEV - Should be local to _physics_process
-var is_stunned = false
+var is_stunned = false # DEV - phase out for state machine alternative
 var item_1 = "hookshot"
 
 const MAX_RUN_SPEED    = 195
@@ -102,6 +102,8 @@ func _ready():
 func _process(delta):
 	state.state_process(delta)
 	
+
+func _physics_process(delta):
 	var colliding_body = get_char_collider()
 	if colliding_body and (colliding_body.is_in_group("Enemies") or colliding_body.is_in_group("Hazards")): # FEAT - Should be "Collidables"
 		handle_body_collided(colliding_body, collide_normal)
@@ -110,9 +112,6 @@ func _process(delta):
 func _input(event):
 	if event.is_action_pressed("shutdown"):
 		emit_signal("shutdown")
-	
-	if is_stunned == true:
-		return # BUG - This should not disable ALL input, e.g., shutdown
 	
 	if direction:
 		last_direction = direction
@@ -144,7 +143,8 @@ func _input(event):
 		debug()
 	
 
-func set_state(new_state): # These don't need to be instances right _now_
+func set_state(new_state): # After initial call, only use state.set_state
+	# DEV - These don't need to be instances right _now_
 	var old_state = state
 	if   new_state == "StandingState":
 		state = StandingState.new(self)
@@ -153,7 +153,7 @@ func set_state(new_state): # These don't need to be instances right _now_
 	elif new_state == "JumpingState":
 		state = JumpingState.new(self)
 	elif new_state == "StunnedState":
-		state = StunnedState.new(self, old_state.state_name)
+		state = StunnedState.new(self, STUN_TIME, old_state.state_name)
 	else:
 		print("invalid state")
 		
@@ -201,17 +201,17 @@ func bounce(bounce_force): # Should be called externally
 	
 
 func reel(reel_force, normal):
-	is_stunned = true
+	state.set_state("StunnedState")
 	reset_velocity()
 	increase_velocity(Vector2(normal.x * reel_force, 0))
 	direction = 0
 	action.clear()
 	update_direction()
-#	switch_mode("stunned") # DEV - Implement as a state
 	
 
 func reset_position():
 	self.position = Vector2(start_pos_x, start_pos_y)
+	state.set_state("StandingState")
 	reset_velocity()
 	
 
@@ -238,9 +238,7 @@ func launch_particle(particle_type):
 	
 
 func debug():
-	print("----------------")
-#	print("jump_count: ", jump_count)
-#	print("state: ", state.get_name())
+	print("state: ", state.get_name())
 	
 
 func handle_body_collided(colliding_body, collision_normal): # DEV - This function name is misleading
