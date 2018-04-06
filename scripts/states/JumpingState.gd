@@ -3,12 +3,7 @@ extends Node
 # This state describes any in which the player is in the air, including falling
 # after running off a ledge. It is not limited to voluntarily jumping.
 
-# Buglist
-# Mid-air Freeze
-#   The player goes back to a standing animation despite being in JumpingState
-#   When running off a ledge
-
-var exiting = false
+var exiting = false # Prevents double state-setting
 var is_grounded = true
 var player
 var state_name = "JumpingState"

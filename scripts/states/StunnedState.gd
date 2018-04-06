@@ -2,7 +2,8 @@ extends Node
 
 # This state describes when a player has been stunned. It is up to an
 # externally set timer to release the player from this state.
-var exiting = false
+
+var exiting = false # Prevents double state-setting
 var player
 var state_name = "StunnedState"
 var stun_time
@@ -27,7 +28,7 @@ func state_process(delta):
 
 func handle_timeout(timer_name): # Called by timer after it times out
 	if timer_name == "unstun":
-		set_state(old_state_name) # DEV - This could possibly be problematic
+		set_state(old_state_name) # DEV - This could possibly be problematic if other state is also timer-based
 	
 
 func set_state(new_state):

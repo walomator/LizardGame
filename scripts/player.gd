@@ -6,10 +6,7 @@ extends "character.gd"
 #	Sprites for protagonist's running animation don't align with idle
 #	Fix: edit animation frames
 
-# Floating Bug
-#	Replicable: y
-#	Pressig against a wall will cause the air animation to switch on and off
-#	Fix: There needs to be some sort of flag when jumping that allows air animation to play
+# FEAT - Implement more default_action functions like default_move
 
 var debug = false
 
@@ -36,18 +33,13 @@ var last_direction = 1 # The direction last moved, or the facing direction
 var start_pos_x = 128
 var start_pos_y = 128
 var run_speed = 0
-var force_x = 0
-var force_y = 0
 var is_moving = false # Running implies specifically FAST running, to be considered if there will be multiple speeds
-var is_grounded = true
-var time_since_liftoff = 0 # DEV - Should be local to _physics_process
-var is_stunned = false # DEV - phase out for state machine alternative
 var item_1 = "hookshot"
 
 const MAX_RUN_SPEED    = 195
-const MAX_VELOCITY     = 400 # DEV - note: adjustment to MAX_VELOCITY of character.gd class
+const MAX_VELOCITY     = 400 # Adjustment from MAX_VELOCITY of character.gd class
 const JUMP_FORCE       = 260
-const BOUNCE_FORCE     = 200 # Likely to be enemy specific in the future
+const BOUNCE_FORCE     = 200 # FEAT - Should be enemy-specific
 #const GRAVITY          = 400 # Opposes jump force
 const HURT_FORCE       = 80
 const STUN_TIME        = 0.5
@@ -57,7 +49,6 @@ const AIR_ACCELERATION = 4
 
 var jump_count = 0
 var max_jump_count = 2
-var airborn = true
 
 const ActionHolder = preload("res://scripts/action_holder.gd")
 var action
@@ -93,7 +84,7 @@ func _ready():
 	
 	root_node.call_deferred("add_child", center_box_node) # DEV - This should be handled elsewhere
 	self.connect("body_collided", collision_handler_node, "handle_body_collided")
-	self.connect("shutdown", global_node, "handle_shutdown") # BUG - The user loses control if the player object is gone
+	self.connect("shutdown", global_node, "handle_shutdown")
 	self.connect("exited_center_box", global_node, "handle_exited_center_box")
 	
 	action = ActionHolder.new()
@@ -194,7 +185,6 @@ func update_direction(): # Decides how to update sprite
 	
 
 func bounce(bounce_force): # Should be called externally
-	is_grounded = false
 	reset_velocity()
 	increase_velocity(Vector2(0, -bounce_force))
 	jump_count = 1

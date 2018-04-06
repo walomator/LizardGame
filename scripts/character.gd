@@ -1,5 +1,13 @@
 extends KinematicBody2D
 
+# Buglist
+# Nonviolent-Head-Stomper
+#	Replicable: y
+#	Player is not bouncing on enemies because move_and_slide generally hates
+#	colliding with the ground. However, it seems the first bounce always works,
+#	so it may be something else.
+#	Fix: switch to using move_and_collide then move_and_slide, or use Area2D
+#	boxes instead of collision boxes on enemies
 
 const GRAVITY      = 400
 const MAX_VELOCITY = 1000

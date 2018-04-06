@@ -1,6 +1,6 @@
 extends Node
 
-var exiting = false
+var exiting = false # Prevents double state-setting
 var is_grounded = true # DEV - Not currently implemented, but may solve the jumping problem
 var player
 var state_name = "StandingState"
