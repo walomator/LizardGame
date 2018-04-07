@@ -53,8 +53,8 @@ func _physics_process(delta):
 				entity_collision = get_slide_collision(0)
 				collide_normal = entity_collision.normal
 				colliding_body = entity_collision.collider
-			
 		# End if is on a surface
+		
 		if entity_collision == null:
 			collide_normal = Vector2(0, 0)
 			colliding_body = null
@@ -92,7 +92,7 @@ func reset_velocity():
 	velocity = Vector2(0, 0)
 	
 
-func drag(ground_drag, delta):
+func drag(ground_drag, delta): # FEAT - Support slopes
 	var moving_direction = sign(velocity.x)
 	velocity.x -= moving_direction * ground_drag * delta # Decelerate player if sliding without input
 	if moving_direction != sign(velocity.x):

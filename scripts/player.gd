@@ -30,7 +30,7 @@ signal shutdown
 
 var direction = 0 # 0 = stationary, 1 = right, -1 = left
 var last_direction = 1 # The direction last moved, or the facing direction
-var start_pos_x = 128
+var start_pos_x = 128 # DEV - Make single vector
 var start_pos_y = 128
 var run_speed = 0
 var is_moving = false # Running implies specifically FAST running, to be considered if there will be multiple speeds
@@ -96,6 +96,7 @@ func _process(delta):
 
 func _physics_process(delta):
 	var colliding_body = get_char_collider()
+	# BUG - Use get_char_collision_normal()
 	if colliding_body and (colliding_body.is_in_group("Enemies") or colliding_body.is_in_group("Hazards")): # FEAT - Should be "Collidables"
 		handle_body_collided(colliding_body, collide_normal)
 	
@@ -121,7 +122,7 @@ func _input(event):
 		action.remove("left")
 		update_direction()
 	
-	if event.is_action_pressed("move_up") and jump_count < max_jump_count:
+	if event.is_action_pressed("move_up") and jump_count < max_jump_count: # DEV - Implement jump_count checking in jump function
 		state.jump()
 	
 	if event.is_action_pressed("reset"):
